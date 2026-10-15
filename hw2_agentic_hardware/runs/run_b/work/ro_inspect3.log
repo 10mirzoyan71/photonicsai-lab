@@ -1,0 +1,65 @@
+exit_code=0 seconds=2.7
+--- stdout ---
+def load_excerpt(path: str = DEFAULT_MAT):
+    """Return centred u, y of the excerpt (numpy, length 4096)."""
+    d = sio.loadmat(path)
+    u = d["V1"].ravel().astype(np.float64)[START:START + N_TOTAL]   # input voltage
+    y = d["V2"].ravel().astype(np.float64)[START:START + N_TOTAL]   # output voltage
+    assert len(u) == N_TOTAL
+    return u - u.mean(), y - y.mean()
+---
+@torch.no_grad()
+def free_run(f, u, y, uh):
+    """Start at sample 0 with measured y[0] and a finite-difference velocity,
+    integrate through the 3072 training samples and on through the 1024 test
+    samples with the same state.  Only u is read after the start; y is never
+    read again.  Returns prediction, train RMSE, test RMSE."""
+    U = torch.as_tensor(u)
+    UH = torch.as_tensor(uh)
+    y0 = torch.tensor(y[0])
+    v0 = torch.tensor(start_velocity(y))
+    yhat = rollout(f, y0, v0, U, UH).numpy()
+    err = yhat - y
+    rmse_train = float(np.sqrt(np.mean(err[:N_TRAIN] ** 2)))
+    rmse_test = float(np.sqrt(np.mean(err[N_TRAIN:] ** 2)))
+    if not np.all(np.isfinite(yhat)):
+        rmse_train = rmse_test = float("inf")
+    return yhat, rmse_train, rmse_test
+---
+def half_sample_input(u: np.ndarray, kind: str = "sinc", M: int = 8) -> np.ndarray:
+    """u at t_k + dt/2 for k = 0..N-2, needed by the RK4 midpoint stages.
+
+    'linear': (u_k + u_{k+1}) / 2.
+    'sinc'  : 2M-tap Hann-windowed sinc (band-limited) interpolator; the input
+              is a multisine up to 200 Hz, where linear interpolation loses
+              almost half of the amplitude (cos(pi*200/610) ~ 0.51).
+    Only u is used, which is known on the whole excerpt (train and test)."""
+    if kind == "linear":
+        return 0.5 * (u[:-1] + u[1:])
+    m = np.arange(-M + 1, M + 1)
+    t = m - 0.5
+    h = np.sinc(t) * (0.5 + 0.5 * np.cos(np.pi * t / M))
+    h /= h.sum()
+    up = np.pad(u, (M - 1, M), mode="reflect")
+    return np.correlate(up, h, mode="valid")[:-1]
+---
+SUM: | R_duffing | duffing | - | - | 0.0 | adam | 0.003 | 600 | 256 | 4 | 0.405 | 0.393 | 90 |
+SUM: | A2_h5 | mlp | (64, 64) | tanh | 1.0 | adam | 0.003 | 1000 | 128 | 4481 | 0.407 | 0.422 | 84 |
+A2_h5.json: {"config": {"name": "A2_h5", "model": "mlp", "hidden": [64, 64], "act": "tanh", "linear_skip": false, "input_scale": 1.0, "interp": "sinc", "pretrain_steps": 500, "optimizer": "adam", "lr": 0.003, "weight_decay": 0.0, "steps": 1000, "rollout": 128, "rollout_start": 16, "curriculum_frac": 0.4, "batch": 32, "clip": 1.0, "physics_weight": 1.0, "colloc": 512, "colloc_box": 1.5, "physics_source": "identified", "eval_every": 100, "seed": 0, "extra": {}}, "n_params": 4481, "rmse_train": 0.00040721431617798747, "rmse_test": 0.00042225465297085084, "best_step": 1000, "seconds": 84.29898524284363, "history": "<11>", "baseline_zero_test": 0.060491854406981314, "ls_coeffs": {"a": 40.907650571750374, "b": 184104.243280967, "c": 627239.0175989916, "g": 179479.79747339798}, "pinn_coeffs": {"a": 40.95018287988032, "b": 184923.8735549604, "c": 747414.3840226742, "g": 186149.95431543348}}
+R_duffing.json: {"config": {"name": "R_duffing", "model": "duffing", "hidden": [64, 64], "act": "tanh", "linear_skip": false, "input_scale": 1.0, "interp": "sinc", "pretrain_steps": 500, "optimizer": "adam", "lr": 0.003, "weight_decay": 0.0, "steps": 600, "rollout": 256, "rollout_start": 16, "curriculum_frac": 0.4, "batch": 32, "clip": 1.0, "physics_weight": 0.0, "colloc": 512, "colloc_box": 1.5, "physics_source": "identified", "eval_every": 100, "seed": 0, "extra": {}}, "n_params": 4, "rmse_train": 0.00040504674625549755, "rmse_test": 0.0003933215425568503, "best_step": 600, "seconds": 89.71876001358032, "history": "<7>", "baseline_zero_test": 0.060491854406981314, "ls_coeffs": {"a": 40.907650571750374, "b": 184104.243280967, "c": 627239.0175989916, "g": 179479.79747339798}, "duffing_coeffs": {"a": 40.95018287988032, "b": 184923.8735549604, "c": 747414.3840226742, "g": 186149.95431543348}}
+kept.json: {"name": "A2_h5", "rmse_train": 0.00040721431617798747, "rmse_test": 0.00042225465297085084, "config": {"name": "A2_h5", "model": "mlp", "hidden": [64, 64], "act": "tanh", "linear_skip": false, "input_scale": 1.0, "interp": "sinc", "pretrain_steps": 500, "optimizer": "adam", "lr": 0.003, "weight_decay": 0.0, "steps": 1000, "rollout": 128, "rollout_start": 16, "curriculum_frac": 0.4, "batch": 32, "clip": 1.0, "physics_weight": 1.0, "colloc": 512, "colloc_box": 1.5, "physics_source": "identified", "eval_every": 100, "seed": 0, "extra": {}}, "n_params": 4481, "readout": {"a": 40.993734091085756, "b": 185010.11436444698, "c": 732647.4360157407, "g": 186747.39054411263}, "readout_r2": 0.9999875584029599, "f0_hz": 68.45700068877187}
+load_excerpt sig (path: 'str' = 'C:\\Users\\erik_\\PyCharmMiscProject\\hw2\\hw2_agentic_hardware\\runs\\run_b\\work\\silverbox\\..\\data\\SNLS80mV.mat') free_run sig (f, u, y, uh)
+excerpt <class 'tuple'> [(4096,), (4096,)]
+A2_h5 TRAIN_RMSE=0.000407214 TEST_RMSE=0.000422255 sec 0.7
+R_duffing TRAIN_RMSE=0.000405047 TEST_RMSE=0.000393322 sec 0.4
+A2_h5 json rmse_train/test 0.00040721431617798747 0.00042225465297085084 | new (0.00040721431617798747, 0.00042225465297085084)
+   train abs diff 0.0 rel 0.0000% ok
+   test abs diff 0.0 rel 0.0000% ok
+R_duffing json rmse_train/test 0.00040504674625549755 0.0003933215425568503 | new (0.00040504674625549755, 0.0003933215425568503)
+   train abs diff 0.0 rel 0.0000% ok
+   test abs diff 0.0 rel 0.0000% ok
+TRAIN_RMSE=0.000407214
+TEST_RMSE=0.000422255
+kept.json unchanged (never opened for writing)
+
+--- stderr ---

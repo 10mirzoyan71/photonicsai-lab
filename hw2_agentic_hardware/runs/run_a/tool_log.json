@@ -1,0 +1,79 @@
+[
+ {
+  "action": "write",
+  "filename": "inspect_sb.py",
+  "time": 1791922641.3043854,
+  "ok": true,
+  "path": "C:\\Users\\erik_\\PyCharmMiscProject\\hw2\\hw2_agentic_hardware\\runs\\run_a\\work\\inspect_sb.py",
+  "bytes": 429
+ },
+ {
+  "action": "run",
+  "filename": "inspect_sb.py",
+  "time": 1791922645.3526256,
+  "exit_code": 0,
+  "stdout": "===== load_excerpt\ndef load_excerpt(path: str = DEFAULT_MAT):\n    \"\"\"Return centred u, y of the excerpt (numpy, length 4096).\"\"\"\n    d = sio.loadmat(path)\n    u = d[\"V1\"].ravel().astype(np.float64)[START:START + N_TOTAL]   # input voltage\n    y = d[\"V2\"].ravel().astype(np.float64)[START:START + N_TOTAL]   # output voltage\n    assert len(u) == N_TOTAL\n    return u - u.mean(), y - y.mean()\n\n\n\n===== load_model\ndef load_model(pt_path: str):\n    ck = torch.load(pt_path, weights_only=False)\n    cfg = Config(**ck[\"config\"])\n    f = build(cfg, ck[\"scales\"])\n    f.load_state_dict(ck[\"state_dict\"])\n    return f, cfg\n\n\nif __name__ == \"__main__\":\n    import argparse\n    p = argparse.ArgumentParser(description=\"train one configuration\")\n    p.add_argument(\"--json\", help=\"config as a JSON string\", default=\"{}\")\n    p.add_argument(\"--out\", default=os.path.join(HERE, \"results\"))\n    a = p.parse_args()\n    train(Config(**json.loads(a.json)), out_dir=a.out)\n\n===== free_run\ndef free_run(f, u, y, uh):\n    \"\"\"Start at sample 0 with measured y[0] and a finite-difference velocity,\n    integrate through the 3072 training samples and on through the 1024 test\n    samples with the same state.  Only u is read after the start; y is never\n    read again.  Returns prediction, train RMSE, test RMSE.\"\"\"\n    U = torch.as_tensor(u)\n    UH = torch.as_tensor(uh)\n    y0 = torch.tensor(y[0])\n    v0 = torch.tensor(start_velocity(y))\n    yhat = rollout(f, y0, v0, U, UH).numpy()\n    err = yhat - y\n    rmse_train = float(np.sqrt(np.mean(err[:N_TRAIN] ** 2)))\n    rmse_test = float(np.sqrt(np.mean(err[N_TRAIN:] ** 2)))\n    if not np.all(np.isfinite(yhat)):\n        rmse_train = rmse_test = float(\"inf\")\n    return yhat, rmse_train, rmse_test\n\n\n# ----------------------------------------------------------------------------\n# training\n# ----------------------------------------------------------------------------\n@dataclass\nclass Config:\n    name: str = \"run\"\n    model: str = \"mlp\"                 # \"mlp\" or \"duffing\" (4-parameter reference)\n    hidden: tuple = (64, 64)\n    act: str = \"tanh\"\n    linear_skip: bool = False\n    input_scale: float = 1.0           # inputs divided by input_scale * std (training record)\n    interp: str = \"sinc\"               # input at RK4 midpoints: \"sinc\" or \"linear\"\n    pretrain_steps: int = 500          # equation-residual (collocation) pre-fit\n    optimizer: str = \"adam\"            # \"adam\", \"adamw\", \"rmsprop\"\n    lr: float = 3e-3\n    weight_decay: float = 0.0\n    steps: int = 1500                  # rollout-training steps\n    rollout: int = 128                 # final rollout length (samples)\n    rollout_start: int = 16            # curriculum: first rollout length\n    curriculum_frac: float = 0.4       # fraction of steps used to grow the rollout\n    batch: int = 32                    # windows per step\n    clip: float = 1.0\n    physics_weight: float = 0.0        # weight of the PINN residual loss on collocation points\n    colloc: int = 512                  # collocation points per step\n    colloc_box: float = 1.5            # collocation box = colloc_box * max|.| of the training record\n    physics_source: str = \"identified\" # \"identified\": a,b,c,g fixed from the rollout fit of eq. (1)\n                                       #   (stage A, file results/R_duffing.json);  \"joint\": learned with the net\n    eval_every: int = 100\n    seed: int = 0\n    extra: dict = field(default_factory=dict)\n\n\n\n===== half_sample_input\ndef half_sample_input(u: np.ndarray, kind: str = \"sinc\", M: int = 8) -> np.ndarray:\n    \"\"\"u at t_k + dt/2 for k = 0..N-2, needed by the RK4 midpoint stages.\n\n    'linear': (u_k + u_{k+1}) / 2.\n    'sinc'  : 2M-tap Hann-windowed sinc (band-limited) interpolator; the input\n              is a multisine up to 200 Hz, where linear interpolation loses\n              almost half of the amplitude (cos(pi*200/610) ~ 0.51).\n    Only u is used, which is known on the whole excerpt (train and test).\"\"\"\n    if kind == \"linear\":\n        return 0.5 * (u[:-1] + u[1:])\n    m = np.arange(-M + 1, M + 1)\n    t = m - 0.5\n    h = np.sinc(t) * (0.5 + 0.5 * np.cos(np.pi * t / M))\n    h /= h.sum()\n    up = np.pad(u, (M - 1, M), mode=\"reflect\")\n    return np.correlate(up, h, mode=\"valid\")[:-1]\n\n\n# ----------------------------------------------------------------------------\n# model\n# ----------------------------------------------------------------------------\nACTS = {\"tanh\": nn.Tanh, \"silu\": nn.SiLU, \"elu\": nn.ELU, \"relu\": nn.ReLU, \"softplus\": nn.Softplus}\n\n\nclass AccelNet(nn.Module):\n    \"\"\"alpha_theta(y, v, u): fully connected network with fixed input/output scaling.\n\n    inputs are divided by (y_s, v_s, u_s) so that each is O(1); the raw network\n    output is multiplied by a_s, the scale of the acceleration (~ 1e4 V/s^2).\n    Optional `linear_skip`: a bias-free linear layer from the scaled inputs to\n    the output, added to the MLP (the linear part of a spring-damper force).\"\"\"\n\n    def __init__(self, hidden=(64, 64), act=\"tanh\", linear_skip=False, scales=(1.0, 1.0, 1.0, 1.0)):\n        super().__init__()\n        layers, n_in = [], 3\n        for h in hidden:\n            layers += [nn.Linear(n_in, h), ACTS[act]()]\n            n_in = h\n        layers.append(nn.Linear(n_in, 1))\n        self.mlp = nn.Sequential(*layers)\n        self.skip = nn.Linear(3, 1, bias=False) if linear_skip else None\n        self.register_buffer(\"scales\", torch.tensor(scales, dtype=torch.float64))\n\n    def forward(self, y, v, u):\n        ys, vs, us, a_s = self.scales\n        x = torch.stack((y / ys, v / vs, u / us), dim=-1)\n        out = self.mlp(x).squeeze(-1)\n        if self.skip is not None:\n            out = out + self.skip(x).squeeze(-1)\n        return a_s * out\n\n\nclass DuffingForce(nn.Module):\n    \"\"\"Reference (not a network): alpha = -a v - b y - c y^3 + g u, 4 parameters.\"\"\"\n\n    def __init__(self, a=30.0, b=1.9e5, c=0.0, g=1.0e4, cubic=True):\n        super().__init__()\n        self.cubic = cubic\n        self.p = nn.Parameter(torch.tensor([a, b, c, g], dtype=torch.float64))\n        self.register_buffer(\"pscale\", torch.tensor([10.0, 1e5, 1e6, 1e4]))\n        with torch.no_grad():\n            self.p.div_(self.pscale)\n\n    def coeffs(self):\n        c = (self.p * self.pscale).detach().numpy().copy()\n        if not self.cubic:\n            c[2] = 0.0\n        return c\n\n    def forward(self, y, v, u):\n        a, b, c, g = self.p * self.pscale\n        if not self.cubic:\n            c = c * 0.0\n        return -a * v - b * y - c * y ** 3 + g * u\n\n\n\n===== A2_h5.json\n{\n \"config\": {\n  \"name\": \"A2_h5\",\n  \"model\": \"mlp\",\n  \"hidden\": [\n   64,\n   64\n  ],\n  \"act\": \"tanh\",\n  \"linear_skip\": false,\n  \"input_scale\": 1.0,\n  \"interp\": \"sinc\",\n  \"pretrain_steps\": 500,\n  \"optimizer\": \"adam\",\n  \"lr\": 0.003,\n  \"weight_decay\": 0.0,\n  \"steps\": 1000,\n  \"rollout\": 128,\n  \"rollout_start\": 16,\n  \"curriculum_frac\": 0.4,\n  \"batch\": 32,\n  \"clip\": 1.0,\n  \"physics_weight\": 1.0,\n  \"colloc\": 512,\n  \"colloc_box\": 1.5,\n  \"physics_source\": \"identified\",\n  \"eval_every\": 100,\n  \"seed\": 0,\n  \"extra\": {}\n },\n \"n_params\": 4481,\n \"rmse_train\": 0.00040721431617798747,\n \"rmse_test\": 0.00042225465297085084,\n \"best_step\": 1000,\n \"seconds\": 84.29898524284363,\n \"history\": [\n  {\n   \"stage\": \"pretrain\",\n   \"step\": 0,\n   \"loss\": 0.0022265676754513308,\n   \"free_train\": 0.00342589654813334,\n   \"free_test\": 0.004593340644980795\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 100,\n   \"L\": 27,\n   \"loss\": 0.0016511214279899327,\n   \"free_train\": 0.002611134789633762,\n   \"free_test\": 0.0037803781398793855\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 200,\n   \"L\": 45,\n   \"loss\": 0.0007469749750587649,\n   \"free_train\": 0.0006176264321151157,\n   \"free_test\": 0.0008661309919401318\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 300,\n   \"L\": 76,\n   \"loss\": 0.004475257989188575,\n   \"free_train\": 0.008711427099794293,\n   \"free_test\": 0.009689570053252656\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 400,\n   \"L\": 128,\n   \"loss\": 0.0004885648478115772,\n   \"free_train\": 0.0004749623170806483,\n   \"free_test\": 0.0005512563977701558\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 500,\n   \"L\": 128,\n   \"loss\": 0.00044380721453630555,\n   \"free_train\": 0.0013120762567099076,\n   \"free_test\": 0.0015095096671211504\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 600,\n   \"L\": 128,\n   \"loss\": 0.0003765784120609095,\n   \"free_train\": 0.00043302085752046636,\n   \"free_test\": 0.0004902615125210863\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 700,\n   \"L\": 128,\n   \"loss\": 0.0003521652128261569,\n   \"free_train\": 0.0004238756122689129,\n   \"free_test\": 0.0004573747352769795\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 800,\n   \"L\": 128,\n   \"loss\": 0.0003016045815010329,\n   \"free_train\": 0.0004085098519212424,\n   \"free_test\": 0.00042533828894299734\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 900,\n   \"L\": 128,\n   \"loss\": 0.0003593058656530596,\n   \"free_train\": 0.00042616067254231386,\n   \"free_test\": 0.00044929801393472896\n  },\n  {\n   \"stage\": \"rollout\",\n   \"step\": 1000,\n   \"L\": 128,\n   \"loss\": 0.00027951339536656523,\n   \"free_train\": 0.00040721431617798747,\n   \"free_test\": 0.00042225465297085084\n  }\n ],\n \"baseline_zero_test\": 0.060491854406981314,\n \"ls_coeffs\": {\n  \"a\": 40.907650571750374,\n  \"b\": 184104.243280967,\n  \"c\": 627239.0175989916,\n  \"g\": 179479.79747339798\n },\n \"pinn_coeffs\": {\n  \"a\": 40.95018287988032,\n  \"b\": 184923.8735549604,\n  \"c\": 747414.3840226742,\n  \"g\": 186149.95431543348\n }\n}\n===== kept.json\n{\n \"name\": \"A2_h5\",\n \"rmse_train\": 0.00040721431617798747,\n \"rmse_test\": 0.00042225465297085084,\n \"config\": {\n  \"name\": \"A2_h5\",\n  \"model\": \"mlp\",\n  \"hidden\": [\n   64,\n   64\n  ],\n  \"act\": \"tanh\",\n  \"linear_skip\": false,\n  \"input_scale\": 1.0,\n  \"interp\": \"sinc\",\n  \"pretrain_steps\": 500,\n  \"optimizer\": \"adam\",\n  \"lr\": 0.003,\n  \"weight_decay\": 0.0,\n  \"steps\": 1000,\n  \"rollout\": 128,\n  \"rollout_start\": 16,\n  \"curriculum_frac\": 0.4,\n  \"batch\": 32,\n  \"clip\": 1.0,\n  \"physics_weight\": 1.0,\n  \"colloc\": 512,\n  \"colloc_box\": 1.5,\n  \"physics_source\": \"identified\",\n  \"eval_every\": 100,\n  \"seed\": 0,\n  \"extra\": {}\n },\n \"n_params\": 4481,\n \"readout\": {\n  \"a\": 40.993734091085756,\n  \"b\": 185010.11436444698,\n  \"c\": 732647.4360157407,\n  \"g\": 186747.39054411263\n },\n \"readout_r2\": 0.9999875584029599,\n \"f0_hz\": 68.45700068877187\n}\n",
+  "stderr": "",
+  "timed_out": false,
+  "seconds": 0.1,
+  "parsed": {},
+  "ok": true
+ },
+ {
+  "action": "write",
+  "filename": "inspect_sb2.py",
+  "time": 1791922650.4403625,
+  "ok": false,
+  "error": "write budget for this turn is used; run the file and report"
+ },
+ {
+  "action": "run",
+  "filename": "inspect_sb2.py",
+  "time": 1791922650.4406514,
+  "ok": false,
+  "error": "inspect_sb2.py does not exist in the working directory"
+ },
+ {
+  "action": "write",
+  "filename": "inspect_sb3.py",
+  "time": 1791922675.991642,
+  "ok": true,
+  "path": "C:\\Users\\erik_\\PyCharmMiscProject\\hw2\\hw2_agentic_hardware\\runs\\run_a\\work\\inspect_sb3.py",
+  "bytes": 290
+ },
+ {
+  "action": "run",
+  "filename": "inspect_sb3.py",
+  "time": 1791922677.5379124,
+  "exit_code": 0,
+  "stdout": "==================== load_excerpt\ndef load_excerpt(path: str = DEFAULT_MAT):\n    \"\"\"Return centred u, y of the excerpt (numpy, length 4096).\"\"\"\n    d = sio.loadmat(path)\n    u = d[\"V1\"].ravel().astype(np.float64)[START:START + N_TOTAL]   # input voltage\n    y = d[\"V2\"].ravel().astype(np.float64)[START:START + N_TOTAL]   # output voltage\n    assert len(u) == N_TOTAL\n    return u - u.mean(), y - y.mean()\n\n==================== load_model\ndef load_model(pt_path: str):\n    ck = torch.load(pt_path, weights_only=False)\n    cfg = Config(**ck[\"config\"])\n    f = build(cfg, ck[\"scales\"])\n    f.load_state_dict(ck[\"state_dict\"])\n    return f, cfg\n\n==================== free_run\n@torch.no_grad()\ndef free_run(f, u, y, uh):\n    \"\"\"Start at sample 0 with measured y[0] and a finite-difference velocity,\n    integrate through the 3072 training samples and on through the 1024 test\n    samples with the same state.  Only u is read after the start; y is never\n    read again.  Returns prediction, train RMSE, test RMSE.\"\"\"\n    U = torch.as_tensor(u)\n    UH = torch.as_tensor(uh)\n    y0 = torch.tensor(y[0])\n    v0 = torch.tensor(start_velocity(y))\n    yhat = rollout(f, y0, v0, U, UH).numpy()\n    err = yhat - y\n    rmse_train = float(np.sqrt(np.mean(err[:N_TRAIN] ** 2)))\n    rmse_test = float(np.sqrt(np.mean(err[N_TRAIN:] ** 2)))\n    if not np.all(np.isfinite(yhat)):\n        rmse_train = rmse_test = float(\"inf\")\n    return yhat, rmse_train, rmse_test\n\n==================== half_sample_input\ndef half_sample_input(u: np.ndarray, kind: str = \"sinc\", M: int = 8) -> np.ndarray:\n    \"\"\"u at t_k + dt/2 for k = 0..N-2, needed by the RK4 midpoint stages.\n\n    'linear': (u_k + u_{k+1}) / 2.\n    'sinc'  : 2M-tap Hann-windowed sinc (band-limited) interpolator; the input\n              is a multisine up to 200 Hz, where linear interpolation loses\n              almost half of the amplitude (cos(pi*200/610) ~ 0.51).\n    Only u is used, which is known on the whole excerpt (train and test).\"\"\"\n    if kind == \"linear\":\n        return 0.5 * (u[:-1] + u[1:])\n    m = np.arange(-M + 1, M + 1)\n    t = m - 0.5\n    h = np.sinc(t) * (0.5 + 0.5 * np.cos(np.pi * t / M))\n    h /= h.sum()\n    up = np.pad(u, (M - 1, M), mode=\"reflect\")\n    return np.correlate(up, h, mode=\"valid\")[:-1]\n\n",
+  "stderr": "",
+  "timed_out": false,
+  "seconds": 1.5,
+  "parsed": {},
+  "ok": true
+ },
+ {
+  "action": "write",
+  "filename": "recompute_a2h5.py",
+  "time": 1791922708.4601984,
+  "ok": true,
+  "path": "C:\\Users\\erik_\\PyCharmMiscProject\\hw2\\hw2_agentic_hardware\\runs\\run_a\\work\\recompute_a2h5.py",
+  "bytes": 906
+ },
+ {
+  "action": "run",
+  "filename": "recompute_a2h5.py",
+  "time": 1791922710.696276,
+  "exit_code": 0,
+  "stdout": "cfg interp kind found: sinc\nlen(u)= 4096\nyhat finite: True\nTRAIN_RMSE=0.00040721431617798747\nTEST_RMSE=0.00042225465297085084\nstored train 0.00040721431617798747 abs diff 0.0\nstored test 0.00042225465297085084 abs diff 0.0\n",
+  "stderr": "",
+  "timed_out": false,
+  "seconds": 2.2,
+  "parsed": {
+   "test": 0.00042225465297085084,
+   "train": 0.00040721431617798747
+  },
+  "ok": true
+ }
+]

@@ -1,0 +1,20 @@
+[OK]   load MVS SDK and open the camera (0.41 s): <camera.hikrobot_camera.HikrobotCamera object at 0x0000016E246AE270>
+[OK]   read camera info (0.00 s): {'vendor': 'Hikrobot', 'model': 'MV-CS028-10UM', 'serial': 'DA6874945', 'interface': 'USB3 Vision via Hikrobot MVS SDK', 'sensor_width': 1936, 'sensor_height': 1464, 'bit_depth': 12, 'pixel_format': 'Mono12', 'adc_bit_depth': 'ADCBitDepth_12', 'black_level_setting': 180, 'max_dn': 4095, 'exposure_range_us': [9.0, 9999839.0], 'gain_range_db': [0.0, 23.981199264526367], 'exposure_us': 2000.0, 'gain_db': 0.0, 'roi': {'x': 0, 'y': 0, 'width': 1936, 'height': 1464}, 'illumination_control': False, 'simulated': False}
+[OK]   set gain 0 dB (0.00 s): 0.0
+[OK]   set exposure 2000 us (0.00 s): 2000.0
+[OK]   grab one frame (0.02 s): array (1464, 1936) uint16
+       frame: (1464, 1936) uint16 {'mean_dn': 62.45, 'max_dn': 228, 'saturated_fraction': 0.0}
+[OK]   set exposure 4000 us (0.00 s): 4000.0
+[OK]   grab one frame (0.02 s): array (1464, 1936) uint16
+       mean 62.5 DN at 2000 us -> 62.5 DN at 4000 us (ratio 1.00; about 2 when well above the black level and not saturated)
+[OK]   grab 4 frames (0.10 s): array (4, 1464, 1936) uint16
+       temporal noise: {'pairs': 3, 'mean_dn': 62.498, 'temporal_var_dn2': 0.9094, 'temporal_std_dn': 0.9536, 'frame_mean_spread_dn': 0.006}
+       43.8 frames/s with software trigger at 4000 us
+[OK]   set a 256x256 ROI in the centre (0.07 s): (840, 604, 256, 256)
+[OK]   grab with the ROI (0.01 s): (256, 256)
+[OK]   back to the full sensor (0.07 s): (0, 0, 1936, 1464)
+
+Cover the lens (or block all light), then press Enter... [OK]   grab 4 dark frames (0.09 s): array (4, 1464, 1936) uint16
+       black level 62.44 DN, temporal noise 0.9492 DN rms
+
+ALL CONNECTOR CHECKS PASSED - MV-CS028-10UM, 1936x1464, Mono12, ROI used (840, 604, 256, 256). Files in C:\Users\erik_\PyCharmMiscProject\hw3\tests\real_camera_check

@@ -1,0 +1,98 @@
+{
+ "config": {
+  "name": "A2_h3",
+  "model": "mlp",
+  "hidden": [
+   64,
+   64
+  ],
+  "act": "tanh",
+  "linear_skip": false,
+  "input_scale": 1.0,
+  "interp": "sinc",
+  "pretrain_steps": 500,
+  "optimizer": "adam",
+  "lr": 0.003,
+  "weight_decay": 0.0,
+  "steps": 500,
+  "rollout": 256,
+  "rollout_start": 16,
+  "curriculum_frac": 0.4,
+  "batch": 32,
+  "clip": 1.0,
+  "physics_weight": 1.0,
+  "colloc": 512,
+  "colloc_box": 1.5,
+  "physics_source": "identified",
+  "eval_every": 100,
+  "seed": 0,
+  "extra": {}
+ },
+ "n_params": 4481,
+ "rmse_train": 0.0004869096950369905,
+ "rmse_test": 0.0006351511531536064,
+ "best_step": 500,
+ "seconds": 83.42712473869324,
+ "history": [
+  {
+   "stage": "pretrain",
+   "step": 0,
+   "loss": 0.0022265676754513308,
+   "free_train": 0.00342589654813334,
+   "free_test": 0.004593340644980795
+  },
+  {
+   "stage": "rollout",
+   "step": 100,
+   "L": 64,
+   "loss": 0.00631039300167085,
+   "free_train": 0.004455821733487669,
+   "free_test": 0.0055140037050960536
+  },
+  {
+   "stage": "rollout",
+   "step": 200,
+   "L": 256,
+   "loss": 0.003696015264404742,
+   "free_train": 0.002709466571460941,
+   "free_test": 0.0030442395408899936
+  },
+  {
+   "stage": "rollout",
+   "step": 300,
+   "L": 256,
+   "loss": 0.0006198639676237332,
+   "free_train": 0.0005438364266408763,
+   "free_test": 0.0006916554237772764
+  },
+  {
+   "stage": "rollout",
+   "step": 400,
+   "L": 256,
+   "loss": 0.0006001715993275203,
+   "free_train": 0.0005139942688789813,
+   "free_test": 0.0007128043229373002
+  },
+  {
+   "stage": "rollout",
+   "step": 500,
+   "L": 256,
+   "loss": 0.0004888670725961826,
+   "free_train": 0.0004869096950369905,
+   "free_test": 0.0006351511531536064
+  }
+ ],
+ "baseline_zero_test": 0.060491854406981314,
+ "ls_coeffs": {
+  "a": 40.907650571750374,
+  "b": 184104.243280967,
+  "c": 627239.0175989916,
+  "g": 179479.79747339798
+ },
+ "pinn_coeffs": {
+  "a": 40.95018287988032,
+  "b": 184923.8735549604,
+  "c": 747414.3840226742,
+  "g": 186149.95431543348
+ }
+}

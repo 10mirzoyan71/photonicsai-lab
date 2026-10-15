@@ -1,0 +1,31 @@
+{
+ "vendor": "Hikrobot",
+ "model": "MV-CS028-10UM",
+ "serial": "DA6874945",
+ "interface": "USB3 Vision via Hikrobot MVS SDK",
+ "sensor_width": 1936,
+ "sensor_height": 1464,
+ "bit_depth": 12,
+ "pixel_format": "Mono12",
+ "adc_bit_depth": "ADCBitDepth_12",
+ "black_level_setting": 180,
+ "max_dn": 4095,
+ "exposure_range_us": [
+  9.0,
+  9999839.0
+ ],
+ "gain_range_db": [
+  0.0,
+  23.981199264526367
+ ],
+ "exposure_us": 2000.0,
+ "gain_db": 0.0,
+ "roi": {
+  "x": 0,
+  "y": 0,
+  "width": 1936,
+  "height": 1464
+ },
+ "illumination_control": false,
+ "simulated": false
+}

@@ -1,0 +1,11 @@
+exit_code=0 seconds=2.2
+--- stdout ---
+cfg interp kind found: sinc
+len(u)= 4096
+yhat finite: True
+TRAIN_RMSE=0.00040721431617798747
+TEST_RMSE=0.00042225465297085084
+stored train 0.00040721431617798747 abs diff 0.0
+stored test 0.00042225465297085084 abs diff 0.0
+
+--- stderr ---

@@ -1,0 +1,99 @@
+{
+ "config": {
+  "name": "A3_h1",
+  "model": "mlp",
+  "hidden": [
+   64,
+   64,
+   64
+  ],
+  "act": "tanh",
+  "linear_skip": false,
+  "input_scale": 1.0,
+  "interp": "sinc",
+  "pretrain_steps": 500,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "weight_decay": 0.0,
+  "steps": 500,
+  "rollout": 128,
+  "rollout_start": 16,
+  "curriculum_frac": 0.4,
+  "batch": 32,
+  "clip": 1.0,
+  "physics_weight": 1.0,
+  "colloc": 512,
+  "colloc_box": 1.5,
+  "physics_source": "identified",
+  "eval_every": 100,
+  "seed": 0,
+  "extra": {}
+ },
+ "n_params": 8641,
+ "rmse_train": 0.0004450745225336107,
+ "rmse_test": 0.0006168665747166312,
+ "best_step": 400,
+ "seconds": 59.99213004112244,
+ "history": [
+  {
+   "stage": "pretrain",
+   "step": 0,
+   "loss": 0.0016069696865554772,
+   "free_train": 0.003991656993726886,
+   "free_test": 0.005503787869631778
+  },
+  {
+   "stage": "rollout",
+   "step": 100,
+   "L": 45,
+   "loss": 0.001045335680964217,
+   "free_train": 0.0033847487012572683,
+   "free_test": 0.004366368702662337
+  },
+  {
+   "stage": "rollout",
+   "step": 200,
+   "L": 128,
+   "loss": 0.000746302145747849,
+   "free_train": 0.0011450980878204308,
+   "free_test": 0.0016599031758786906
+  },
+  {
+   "stage": "rollout",
+   "step": 300,
+   "L": 128,
+   "loss": 0.0006282138362218923,
+   "free_train": 0.000495171882873829,
+   "free_test": 0.0008003522729985749
+  },
+  {
+   "stage": "rollout",
+   "step": 400,
+   "L": 128,
+   "loss": 0.00045995679832156903,
+   "free_train": 0.0004450745225336107,
+   "free_test": 0.0006168665747166312
+  },
+  {
+   "stage": "rollout",
+   "step": 500,
+   "L": 128,
+   "loss": 0.0006285670993633342,
+   "free_train": 0.0004473646573436029,
+   "free_test": 0.0006694781947701755
+  }
+ ],
+ "baseline_zero_test": 0.060491854406981314,
+ "ls_coeffs": {
+  "a": 40.907650571750374,
+  "b": 184104.243280967,
+  "c": 627239.0175989916,
+  "g": 179479.79747339798
+ },
+ "pinn_coeffs": {
+  "a": 40.95018287988032,
+  "b": 184923.8735549604,
+  "c": 747414.3840226742,
+  "g": 186149.95431543348
+ }
+}

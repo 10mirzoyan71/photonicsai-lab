@@ -1,0 +1,43 @@
+{
+ "name": "A2_h5",
+ "rmse_train": 0.00040721431617798747,
+ "rmse_test": 0.00042225465297085084,
+ "config": {
+  "name": "A2_h5",
+  "model": "mlp",
+  "hidden": [
+   64,
+   64
+  ],
+  "act": "tanh",
+  "linear_skip": false,
+  "input_scale": 1.0,
+  "interp": "sinc",
+  "pretrain_steps": 500,
+  "optimizer": "adam",
+  "lr": 0.003,
+  "weight_decay": 0.0,
+  "steps": 1000,
+  "rollout": 128,
+  "rollout_start": 16,
+  "curriculum_frac": 0.4,
+  "batch": 32,
+  "clip": 1.0,
+  "physics_weight": 1.0,
+  "colloc": 512,
+  "colloc_box": 1.5,
+  "physics_source": "identified",
+  "eval_every": 100,
+  "seed": 0,
+  "extra": {}
+ },
+ "n_params": 4481,
+ "readout": {
+  "a": 40.993734091085756,
+  "b": 185010.11436444698,
+  "c": 732647.4360157407,
+  "g": 186747.39054411263
+ },
+ "readout_r2": 0.9999875584029599,
+ "f0_hz": 68.45700068877187
+}

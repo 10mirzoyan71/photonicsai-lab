@@ -1,0 +1,106 @@
+{
+ "config": {
+  "name": "R_duffing",
+  "model": "duffing",
+  "hidden": [
+   64,
+   64
+  ],
+  "act": "tanh",
+  "linear_skip": false,
+  "input_scale": 1.0,
+  "interp": "sinc",
+  "pretrain_steps": 500,
+  "optimizer": "adam",
+  "lr": 0.003,
+  "weight_decay": 0.0,
+  "steps": 600,
+  "rollout": 256,
+  "rollout_start": 16,
+  "curriculum_frac": 0.4,
+  "batch": 32,
+  "clip": 1.0,
+  "physics_weight": 0.0,
+  "colloc": 512,
+  "colloc_box": 1.5,
+  "physics_source": "identified",
+  "eval_every": 100,
+  "seed": 0,
+  "extra": {}
+ },
+ "n_params": 4,
+ "rmse_train": 0.00040504674625549755,
+ "rmse_test": 0.0003933215425568503,
+ "best_step": 600,
+ "seconds": 89.71876001358032,
+ "history": [
+  {
+   "stage": "pretrain",
+   "step": 0,
+   "loss": 0.000322554845672666,
+   "free_train": 0.004544184667353682,
+   "free_test": 0.007548286986801437
+  },
+  {
+   "stage": "rollout",
+   "step": 100,
+   "L": 51,
+   "loss": 0.0004291936124402614,
+   "free_train": 0.0010980296777796947,
+   "free_test": 0.00122861541500015
+  },
+  {
+   "stage": "rollout",
+   "step": 200,
+   "L": 161,
+   "loss": 0.00016422140788675387,
+   "free_train": 0.0006805941233734047,
+   "free_test": 0.0007177938456462397
+  },
+  {
+   "stage": "rollout",
+   "step": 300,
+   "L": 256,
+   "loss": 8.386728089555527e-05,
+   "free_train": 0.000504501292080528,
+   "free_test": 0.0005115742561336928
+  },
+  {
+   "stage": "rollout",
+   "step": 400,
+   "L": 256,
+   "loss": 7.162426996726667e-05,
+   "free_train": 0.00043595641675626897,
+   "free_test": 0.00042832908994510683
+  },
+  {
+   "stage": "rollout",
+   "step": 500,
+   "L": 256,
+   "loss": 4.576923317504675e-05,
+   "free_train": 0.0004120128540623102,
+   "free_test": 0.0004018144484055375
+  },
+  {
+   "stage": "rollout",
+   "step": 600,
+   "L": 256,
+   "loss": 5.810269923979139e-05,
+   "free_train": 0.00040504674625549755,
+   "free_test": 0.0003933215425568503
+  }
+ ],
+ "baseline_zero_test": 0.060491854406981314,
+ "ls_coeffs": {
+  "a": 40.907650571750374,
+  "b": 184104.243280967,
+  "c": 627239.0175989916,
+  "g": 179479.79747339798
+ },
+ "duffing_coeffs": {
+  "a": 40.95018287988032,
+  "b": 184923.8735549604,
+  "c": 747414.3840226742,
+  "g": 186149.95431543348
+ }
+}

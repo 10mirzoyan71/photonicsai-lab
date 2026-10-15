@@ -1,0 +1,92 @@
+{
+ "config": {
+  "name": "L_pw0",
+  "model": "mlp",
+  "hidden": [
+   64,
+   64
+  ],
+  "act": "tanh",
+  "linear_skip": false,
+  "input_scale": 1.0,
+  "interp": "sinc",
+  "pretrain_steps": 500,
+  "optimizer": "adam",
+  "lr": 0.003,
+  "weight_decay": 0.0,
+  "steps": 500,
+  "rollout": 128,
+  "rollout_start": 16,
+  "curriculum_frac": 0.4,
+  "batch": 32,
+  "clip": 1.0,
+  "physics_weight": 0.0,
+  "colloc": 512,
+  "colloc_box": 1.5,
+  "physics_source": "identified",
+  "eval_every": 100,
+  "seed": 0,
+  "extra": {}
+ },
+ "n_params": 4481,
+ "rmse_train": 0.000725103936497466,
+ "rmse_test": 0.007626848287217659,
+ "best_step": 500,
+ "seconds": 48.322601318359375,
+ "history": [
+  {
+   "stage": "pretrain",
+   "step": 0,
+   "loss": 0.00029405336206161274,
+   "free_train": 0.004675657609280203,
+   "free_test": 0.012610248471552416
+  },
+  {
+   "stage": "rollout",
+   "step": 100,
+   "L": 45,
+   "loss": 0.003805899813956966,
+   "free_train": 0.016925260544091544,
+   "free_test": 0.01725947304563276
+  },
+  {
+   "stage": "rollout",
+   "step": 200,
+   "L": 128,
+   "loss": 0.0018682911948986554,
+   "free_train": 0.0034636274328525107,
+   "free_test": 0.010349070828522303
+  },
+  {
+   "stage": "rollout",
+   "step": 300,
+   "L": 128,
+   "loss": 0.0002448992905450973,
+   "free_train": 0.0009454790584962626,
+   "free_test": 0.007814365932515404
+  },
+  {
+   "stage": "rollout",
+   "step": 400,
+   "L": 128,
+   "loss": 0.00013743359775319786,
+   "free_train": 0.0008213687703218932,
+   "free_test": 0.0079704318651587
+  },
+  {
+   "stage": "rollout",
+   "step": 500,
+   "L": 128,
+   "loss": 0.00014101012055825975,
+   "free_train": 0.000725103936497466,
+   "free_test": 0.007626848287217659
+  }
+ ],
+ "baseline_zero_test": 0.060491854406981314,
+ "ls_coeffs": {
+  "a": 40.907650571750374,
+  "b": 184104.243280967,
+  "c": 627239.0175989916,
+  "g": 179479.79747339798
+ }
+}

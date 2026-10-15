@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.idea/
+data/*.mat
+*.npy
+**/checkpoints.sqlite*
+task6_agentic_system/runs/*/work/*.mat
+hw2_agentic_hardware/runs/*/work/data/*.mat
+task6_agentic_system/tests/smoke.log
+task6_agentic_system/tests/smoke_output/
+report/*.aux
+report/*.log
+report/*.out
+lab/runs/*/*.sqlite*
+*.tif

@@ -1,0 +1,58 @@
+exit_code=0 seconds=1.5
+--- stdout ---
+==================== load_excerpt
+def load_excerpt(path: str = DEFAULT_MAT):
+    """Return centred u, y of the excerpt (numpy, length 4096)."""
+    d = sio.loadmat(path)
+    u = d["V1"].ravel().astype(np.float64)[START:START + N_TOTAL]   # input voltage
+    y = d["V2"].ravel().astype(np.float64)[START:START + N_TOTAL]   # output voltage
+    assert len(u) == N_TOTAL
+    return u - u.mean(), y - y.mean()
+
+==================== load_model
+def load_model(pt_path: str):
+    ck = torch.load(pt_path, weights_only=False)
+    cfg = Config(**ck["config"])
+    f = build(cfg, ck["scales"])
+    f.load_state_dict(ck["state_dict"])
+    return f, cfg
+
+==================== free_run
+@torch.no_grad()
+def free_run(f, u, y, uh):
+    """Start at sample 0 with measured y[0] and a finite-difference velocity,
+    integrate through the 3072 training samples and on through the 1024 test
+    samples with the same state.  Only u is read after the start; y is never
+    read again.  Returns prediction, train RMSE, test RMSE."""
+    U = torch.as_tensor(u)
+    UH = torch.as_tensor(uh)
+    y0 = torch.tensor(y[0])
+    v0 = torch.tensor(start_velocity(y))
+    yhat = rollout(f, y0, v0, U, UH).numpy()
+    err = yhat - y
+    rmse_train = float(np.sqrt(np.mean(err[:N_TRAIN] ** 2)))
+    rmse_test = float(np.sqrt(np.mean(err[N_TRAIN:] ** 2)))
+    if not np.all(np.isfinite(yhat)):
+        rmse_train = rmse_test = float("inf")
+    return yhat, rmse_train, rmse_test
+
+==================== half_sample_input
+def half_sample_input(u: np.ndarray, kind: str = "sinc", M: int = 8) -> np.ndarray:
+    """u at t_k + dt/2 for k = 0..N-2, needed by the RK4 midpoint stages.
+
+    'linear': (u_k + u_{k+1}) / 2.
+    'sinc'  : 2M-tap Hann-windowed sinc (band-limited) interpolator; the input
+              is a multisine up to 200 Hz, where linear interpolation loses
+              almost half of the amplitude (cos(pi*200/610) ~ 0.51).
+    Only u is used, which is known on the whole excerpt (train and test)."""
+    if kind == "linear":
+        return 0.5 * (u[:-1] + u[1:])
+    m = np.arange(-M + 1, M + 1)
+    t = m - 0.5
+    h = np.sinc(t) * (0.5 + 0.5 * np.cos(np.pi * t / M))
+    h /= h.sum()
+    up = np.pad(u, (M - 1, M), mode="reflect")
+    return np.correlate(up, h, mode="valid")[:-1]
+
+
+--- stderr ---

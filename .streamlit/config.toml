@@ -1,0 +1,9 @@
+# Streamlit settings for `python -m streamlit run lab/app.py` started in this folder.
+[server]
+headless = true          # no first-run e-mail prompt; open the printed Local URL (http://localhost:8501) yourself
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"  # no Deploy button and no running figure; the app shows its own light-wave badge while it works
