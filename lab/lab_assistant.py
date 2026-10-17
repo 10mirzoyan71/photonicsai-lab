@@ -136,10 +136,16 @@ TEAM_PROMPTS = {
             "training and 1024 test samples, the free-run RMSE metric (RK4 from the first sample, reading only u on the "
             "test record), the kept network A2_h5 and the identified equation R_duffing. Write the steps as a numbered "
             "list that one Python script can follow. No tools, no code; never claim a number a script did not print." + BRIEF),
-        "executor": ("\nThis team has no camera: the working directory holds silverbox/silverbox_pinn.py (load_excerpt, "
-                     "load_model, free_run and the rest of the Homework 1 code), silverbox/results/*.json and *.pt "
-                     "(A2_h5 = the kept network, R_duffing = the identified equation, kept.json, summary.md) and "
-                     "data/SNLS80mV.mat." + EXEC_BRIEF),
+        "executor": ("\nThis team has no camera: the working directory holds silverbox/silverbox_pinn.py (the Homework 1 "
+                     "code), silverbox/results/*.json and *.pt (A2_h5 = the kept network, R_duffing = the identified "
+                     "equation, kept.json, summary.md) and data/SNLS80mV.mat. The free-run metric of a saved model, run "
+                     "from this directory, is exactly:\n"
+                     "    import sys; sys.path.insert(0, 'silverbox')\n"
+                     "    from silverbox_pinn import load_excerpt, load_model, half_sample_input, free_run\n"
+                     "    u, y = load_excerpt()        # finds data/SNLS80mV.mat itself; centred, in volts\n"
+                     "    f, cfg = load_model('silverbox/results/A2_h5.pt')     # or R_duffing.pt\n"
+                     "    yhat, rmse_train, rmse_test = free_run(f, u, y, half_sample_input(u, cfg.interp))   # volts\n"
+                     "Use it as it is: do not search for the data file and do not re-implement the metric." + EXEC_BRIEF),
     },
 }
 

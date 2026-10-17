@@ -1,0 +1,82 @@
+exit_code=0 seconds=2.7
+--- stdout ---
+KEPT_JSON={  "name": "A2_h5",  "rmse_train": 0.00040721431617798747,  "rmse_test": 0.00042225465297085084,  "config": {   "name": "A2_h5",   "model": "mlp",   "hidden": [    64,    64   ],   "act": "tanh",   "linear_skip": false,   "input_scale": 1.0,   "interp": "sinc",   "pretrain_steps": 500,   "optimizer": "adam",   "lr": 0.003,   "weight_decay": 0.0,   "steps": 1000,   "rollout": 128,   "rollout_start": 16,   "curriculum_frac": 0.4,   "batch": 32,   "clip": 1.0,   "physics_weight": 1.0,   "colloc": 512,   "colloc_box": 1.5,   "physics_source": "identified",   "eval_every": 100,   "seed": 0,   "extra": {}  },  "n_params": 4481,  "readout": {   "a": 40.993734091085756,   "b": 185010.11436444698,   "c": 732647.4360157407,   "g": 186747.39054411263  },  "readout_r2": 0.9999875584029599,  "f0_hz": 68.45700068877187 }
+SRC: Everything needed for one training run and for the free-run metric is here;
+SRC: N_TRAIN = 3072         # first 3072 samples train, last 1024 test
+SRC: """Finite-difference velocity at the first sample (one-sided, 2nd order).
+SRC: Only samples 0..2 of the training record are used."""
+SRC: def half_sample_input(u: np.ndarray, kind: str = "sinc", M: int = 8) -> np.ndarray:
+SRC: almost half of the amplitude (cos(pi*200/610) ~ 0.51).
+SRC: Only u is used, which is known on the whole excerpt (train and test)."""
+SRC: def __init__(self, hidden=(64, 64), act="tanh", linear_skip=False, scales=(1.0, 1.0, 1.0, 1.0)):
+SRC: super().__init__()
+SRC: def __init__(self, a=30.0, b=1.9e5, c=0.0, g=1.0e4, cubic=True):
+SRC: super().__init__()
+SRC: """Start at sample 0 with measured y[0] and a finite-difference velocity,
+SRC: integrate through the 3072 training samples and on through the 1024 test
+SRC: read again.  Returns prediction, train RMSE, test RMSE."""
+SRC: rmse_train = float(np.sqrt(np.mean(err[:N_TRAIN] ** 2)))
+SRC: rmse_test = float(np.sqrt(np.mean(err[N_TRAIN:] ** 2)))
+SRC: if not np.all(np.isfinite(yhat)):
+SRC: rmse_train = rmse_test = float("inf")
+SRC: return yhat, rmse_train, rmse_test
+SRC: # training
+SRC: input_scale: float = 1.0           # inputs divided by input_scale * std (training record)
+SRC: pretrain_steps: int = 500          # equation-residual (collocation) pre-fit
+SRC: steps: int = 1500                  # rollout-training steps
+SRC: colloc_box: float = 1.5            # collocation box = colloc_box * max|.| of the training record
+SRC: t = slice(0, N_TRAIN)                    # scales from the training record only
+SRC: """Least-squares a, b, c, g from finite-difference derivatives on the training record."""
+SRC: sl = slice(2, N_TRAIN - 2)
+SRC: def train(cfg: Config, mat_path: str = DEFAULT_MAT, out_dir: str | None = None, verbose: bool = True):
+SRC: uh = half_sample_input(u, cfg.interp)
+SRC: # range (the test segment reaches |y| = 0.205 V, the training record only 0.174 V).
+SRC: # a, b, c, g are separate physical parameters (initialised by least squares),
+SRC: box = torch.tensor([cfg.colloc_box * np.abs(y[:N_TRAIN]).max(), cfg.colloc_box * np.abs(v_fd[:N_TRAIN]).max(),
+SRC: cfg.colloc_box * np.abs(u[:N_TRAIN]).max()])
+SRC: trainable = list(f.parameters()) + ([q for q in phys.parameters() if q.requires_grad] if phys is not None else [])
+SRC: # training tensors: ONLY the first 3072 samples are used in any loss
+SRC: Ytr = torch.as_tensor(y[:N_TRAIN])
+SRC: Vtr = torch.as_tensor(v_fd[:N_TRAIN])
+SRC: Atr = torch.as_tensor(a_fd[:N_TRAIN])
+SRC: Utr = torch.as_tensor(u[:N_TRAIN])
+SRC: UHtr = torch.as_tensor(uh[:N_TRAIN - 1])
+SRC: ys, a_s = float(np.std(y[:N_TRAIN])), scales[3]
+SRC: # minimise || y''_fd - alpha_theta(y, y'_fd, u) ||^2 on the training samples:
+SRC: # the residual of (2) with finite-difference derivatives.  Gives the network
+SRC: if cfg.pretrain_steps > 0:
+SRC: opt = torch.optim.Adam(trainable, lr=1e-3 if cfg.model == "duffing" else 3e-3)
+SRC: sl = slice(2, N_TRAIN - 2)
+SRC: for it in range(cfg.pretrain_steps):
+SRC: history.append({"stage": "pretrain", "step": 0, "loss": float(loss.detach()), "free_train": r_tr, "free_test": r_te})
+SRC: print(f"[{cfg.name}] pretrain residual {float(loss.detach()):.3e} | free-run train {r_tr*1e3:.2f} mV test {r_te*1e3:.2f} mV", flush=True)
+SRC: # ---- stage 2: rollout (simulation-error) training on windows ---------------
+SRC: opt = make_optimizer(cfg, trainable)
+SRC: best = {"free_train": float("inf"), "state": None, "step": -1}
+SRC: idx = torch.as_tensor(rng.integers(2, N_TRAIN - L, size=cfg.batch))
+SRC: torch.nn.utils.clip_grad_norm_(trainable, cfg.clip)
+SRC: if not torch.isfinite(loss):
+SRC: print(f"[{cfg.name}] non-finite loss at step {it}; stopping", flush=True)
+SRC: history.append({"stage": "rollout", "step": it, "L": L, "loss": float(loss), "free_train": r_tr, "free_test": r_te})
+SRC: # checkpoint selection uses the TRAINING free-run error only
+SRC: if r_tr < best["free_train"]:
+SRC: best = {"free_train": r_tr, "state": {k: t.clone() for k, t in f.state_dict().items()}, "step": it,
+SRC: print(f"[{cfg.name}] step {it:5d} L={L:4d} loss {float(loss):.3e} | free-run train {r_tr*1e3:7.3f} mV  test {r_te*1e3:7.3f} mV  ({time.time()-t0:.0f}s)", flush=True)
+SRC: "config": asdict(cfg), "n_params": n_params, "rmse_train": r_tr, "rmse_test": r_te,
+SRC: "baseline_zero_test": float(np.sqrt(np.mean(y[N_TRAIN:] ** 2))),
+SRC: print(f"[{cfg.name}] DONE  params={n_params}  free-run RMSE train {r_tr*1e3:.3f} mV  test {r_te*1e3:.3f} mV  ({result['seconds']:.0f}s)", flush=True)
+SRC: p = argparse.ArgumentParser(description="train one configuration")
+SRC: train(Config(**json.loads(a.json)), out_dir=a.out)
+RECORD_LEN= 4096 UNITS=volts (centred, per load_excerpt)
+TEST_RECORD=SNLS80mV (data/SNLS80mV.mat, load_excerpt)
+TEST_SEGMENT=second half, indices 2048..4095 (ASSUMED split n//2; verify against silverbox_pinn.py SRC lines)
+N_SAMPLES=2048
+FREERUN_RMSE=0.000391391
+TEST_OUTPUT_STD=0.0593936
+FREERUN_RMSE_OVER_STD=0.00658979
+METRIC_RMSE_TEST_RETURNED=0.00042225465297085084
+MODEL_LOADED_FROM=silverbox/results/A2_h5.pt
+RETRAINED=no
+INIT=as in free_run/half_sample_input of silverbox_pinn.py (not re-implemented)
+
+--- stderr ---

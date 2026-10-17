@@ -68,6 +68,8 @@ TOOLS. You call tools through your structured output:
   {{"tool_calls": [{{"name": "<tool>", "args": {{...}}}}], "reply": ""}}  -> the tools run in that order and the next
       message shows what they returned;
   {{"tool_calls": [], "reply": "<your reply>"}}  -> ends your turn with that reply (no tool runs).
+These tools are NOT tools of this session: calling one directly fails ("No such tool available"). The only way to run
+one is to list it in tool_calls of your structured output.
 The tools and their arguments (JSON schema):
 {tools}"""
 
@@ -136,10 +138,16 @@ class ClaudeCLI:
                     "required": ["name", "args"]}},
                 "reply": {"type": "string", "description": "your reply; used only when tool_calls is empty"}},
             "required": ["tool_calls", "reply"]}
-        history = []
+        history, slips = [], 0
         for _ in range(max_iters):
             step = self.structured(sys_t, self._with_history(prompt, history), step_schema)
             calls = step.get("tool_calls") or []
+            if not calls and "No such tool" in step.get("reply", "") and slips < 2:
+                slips += 1                                   # the model tried a direct call: remind it, try again
+                history.append(("protocol_note", {}, "A direct tool call cannot work in this session. To run a "
+                                "tool, put it in tool_calls of your structured output, e.g. "
+                                '{"tool_calls": [{"name": "' + next(iter(by_name)) + '", "args": {...}}], "reply": ""}.'))
+                continue
             if not calls:
                 return step.get("reply", "")
             for c in calls:

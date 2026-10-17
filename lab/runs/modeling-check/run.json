@@ -1,0 +1,8 @@
+{
+ "thread": "modeling-check",
+ "camera": "sim-room",
+ "director_model": "claude-cli:claude-sonnet-5-5@low",
+ "team_model": "claude-cli:claude-haiku-5-5@low",
+ "allow_human": false,
+ "seed": 1
+}

@@ -1,0 +1,44 @@
+exit_code=0 seconds=3.3
+--- stdout ---
+N_TRAIN= 3072
+SRC_LINE 30 N_TRAIN = 3072         # first 3072 samples train, last 1024 test
+SRC_LINE 73 Only u is used, which is known on the whole excerpt (train and test)."""
+SRC_LINE 172 integrate through the 3072 training samples and on through the 1024 test
+SRC_LINE 174 read again.  Returns prediction, train RMSE, test RMSE."""
+SRC_LINE 181 rmse_train = float(np.sqrt(np.mean(err[:N_TRAIN] ** 2)))
+SRC_LINE 182 rmse_test = float(np.sqrt(np.mean(err[N_TRAIN:] ** 2)))
+SRC_LINE 184 rmse_train = rmse_test = float("inf")
+SRC_LINE 185 return yhat, rmse_train, rmse_test
+SRC_LINE 221 t = slice(0, N_TRAIN)                    # scales from the training record only
+SRC_LINE 228 sl = slice(2, N_TRAIN - 2)
+SRC_LINE 265 # range (the test segment reaches |y| = 0.205 V, the training record only 0.174 V).
+SRC_LINE 280 box = torch.tensor([cfg.colloc_box * np.abs(y[:N_TRAIN]).max(), cfg.colloc_box * np.abs(v_fd[:N_TRAIN]).max(),
+SRC_LINE 281 cfg.colloc_box * np.abs(u[:N_TRAIN]).max()])
+SRC_LINE 292 Ytr = torch.as_tensor(y[:N_TRAIN])
+SRC_LINE 293 Vtr = torch.as_tensor(v_fd[:N_TRAIN])
+SRC_LINE 294 Atr = torch.as_tensor(a_fd[:N_TRAIN])
+SRC_LINE 295 Utr = torch.as_tensor(u[:N_TRAIN])
+SRC_LINE 296 UHtr = torch.as_tensor(uh[:N_TRAIN - 1])
+SRC_LINE 297 ys, a_s = float(np.std(y[:N_TRAIN])), scales[3]
+SRC_LINE 306 sl = slice(2, N_TRAIN - 2)
+SRC_LINE 314 history.append({"stage": "pretrain", "step": 0, "loss": float(loss.detach()), "free_train": r_tr, "free_test": r_te})
+SRC_LINE 316 print(f"[{cfg.name}] pretrain residual {float(loss.detach()):.3e} | free-run train {r_tr*1e3:.2f} mV test {r_te*1e3:.2f} mV", flush=True)
+SRC_LINE 326 idx = torch.as_tensor(rng.integers(2, N_TRAIN - L, size=cfg.batch))
+SRC_LINE 343 history.append({"stage": "rollout", "step": it, "L": L, "loss": float(loss), "free_train": r_tr, "free_test": r_te})
+SRC_LINE 349 print(f"[{cfg.name}] step {it:5d} L={L:4d} loss {float(loss):.3e} | free-run train {r_tr*1e3:7.3f} mV  test {r_te*1e3:7.3f} mV  ({time.time()-t0:.0f}s)", flush=True)
+SRC_LINE 355 "config": asdict(cfg), "n_params": n_params, "rmse_train": r_tr, "rmse_test": r_te,
+SRC_LINE 357 "baseline_zero_test": float(np.sqrt(np.mean(y[N_TRAIN:] ** 2))),
+SRC_LINE 372 print(f"[{cfg.name}] DONE  params={n_params}  free-run RMSE train {r_tr*1e3:.3f} mV  test {r_te*1e3:.3f} mV  ({result['seconds']:.0f}s)", flush=True)
+TEST_RECORD=SNLS80mV
+MODEL_LOADED_FROM=silverbox/results/A2_h5.pt
+RETRAINED=no
+UNITS=V (volts, per free_run metric)
+INIT_CONDITIONS=as implemented in free_run/half_sample_input in silverbox_pinn.py (not re-implemented)
+METRIC_RMSE_TEST_RETURNED= 0.00042225465297085084
+TEST_SEGMENT=3072..4095
+N_SAMPLES= 1024
+FREERUN_RMSE= 0.00042225465297085084
+TEST_OUTPUT_STD= 0.06048032370040003
+FREERUN_RMSE_OVER_STD= 0.006981686392132487
+
+--- stderr ---

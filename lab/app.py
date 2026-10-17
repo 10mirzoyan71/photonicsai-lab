@@ -219,7 +219,8 @@ def side_panel(run_dir: str | None, events: list, usage: dict, replay: bool):
     for team, rec in recs:
         with st.expander(f"{TEAM_ICON.get(team, '')} {team}: {rec.get('tool')}"):
             st.json(rec)
-    figs = core.figures(run_dir)[:3] if run_dir else []
+    # in a replay, the figures appear once a team has reported (they are the run's final files)
+    figs = core.figures(run_dir)[:3] if run_dir and (not replay or recs) else []
     for f in figs:
         st.image(f, caption=os.path.relpath(f, run_dir), width="stretch")
 
@@ -241,6 +242,16 @@ ws = workers()
 runs = core.list_runs()
 known = {r["thread"]: r for r in runs}
 options = [""] + [t for t in ws if t not in known] + [r["thread"] for r in runs]
+# a link can open a run directly: ?run=<thread>&mode=Replay&step=40 (read once, when the page opens)
+if "opened" not in st.session_state:
+    st.session_state.opened = True
+    qp = st.query_params
+    if qp.get("run") in options:
+        st.session_state.current = qp["run"]
+        if qp.get("step", "").isdigit():
+            st.session_state[f"pos_{qp['run']}"] = int(qp["step"])
+    if qp.get("mode") in ("Live", "Replay"):
+        st.session_state.mode = qp["mode"]
 # the selected run lives in session state, not in the widget: the list changes as runs start and finish, and a
 # changed list makes Streamlit draw the select box as a new widget, which then starts from this index
 current = st.session_state.get("current", "")
