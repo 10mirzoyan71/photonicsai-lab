@@ -244,7 +244,30 @@ call in a test), short prompts and reports, a decision budget per level, and at 
 \texttt{transcript.json}, and the app shows it.
 
 %======================================================================
-\section*{8. Limits and next steps}
+\section*{8. Relation to Lecture 5 (multi-hardware integration)}
+%======================================================================
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}p{0.36\linewidth}X@{}}
+\toprule
+principle of the lecture & in the lab assistant\\ \midrule
+multi-setup orchestration: a coordinator plans, each setup keeps control of its own devices & the director gives tasks;
+  each team owns its tools (only the instrument team reaches the camera)\\
+agent-to-agent messages: task IDs, typed inputs, status, structured results & structured decisions (Pydantic), one
+  thread ID per team task, VERIFIED records as the results\\
+a remote model plans; deterministic limits stay outside the model & the MCP server refuses what is out of the camera's
+  range or the lab limits (500\,ms, 24\,dB, 16 frames); the director's guards are code\\
+triggering and records & software trigger (each frame exposed after the settings are applied); every call is logged
+  with its time and duration in \texttt{calls.jsonl}\\
+error handling and safe recovery; never hide partial completion & checkpoints at every step, Retry from the last one,
+  restored camera settings after a server restart; the report marks what is not verified\\
+reserve shared resources before dispatch & one run at a time holds the camera; the app closes idle runs before a new
+  one starts\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+%======================================================================
+\section*{9. Limits and next steps}
 %======================================================================
 The lab has no laser for this project, so the optics team's focusing runs on the simulated bench with a camera model
 measured on the real camera; the next step is the lab's DMD in front of the camera, as a fourth team or as a tool of the
