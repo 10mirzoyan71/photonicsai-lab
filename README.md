@@ -1,4 +1,4 @@
-# PhotonicsAI Lab Assistant — Homeworks 4 and 5
+# PhotonicsAI Lab Assistant — Homework 4 (with 5): From Prototype to Product
 
 Erik Mirzoyan. Course: PhotonicsAI — AI-Driven Science and Autonomous Laboratories.
 

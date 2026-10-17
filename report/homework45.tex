@@ -19,7 +19,7 @@
 \begin{document}
 \begin{center}
 {\Large\bfseries PhotonicsAI --- AI-Driven Science and Autonomous Laboratories}\\[3pt]
-{\large Homeworks 4 and 5: the PhotonicsAI Lab Assistant}\\[6pt]
+{\large Homework 4 (with 5): From Prototype to Product --- the PhotonicsAI Lab Assistant}\\[6pt]
 Name: \studentname\\[2pt]
 Code: \url{\repourl}
 \end{center}
@@ -34,8 +34,12 @@ results while the agents work. The new parts are:
 \item \textbf{two more levels of hierarchy}: a director above the three homework systems, which now work as teams;
 \item \textbf{questions passed up the hierarchy}: a team's question to the person reaches the person through the director,
   also when the process is restarted between the question and the answer;
-\item \textbf{a web application} (Streamlit) with approval and action cards, a camera panel, verified results, a token
-  meter, a replay mode, and runs that can be continued or retried;
+\item \textbf{a backend/frontend application}: the lab engine, the camera's MCP server and the model backend behind a
+  web frontend (Streamlit) with approval and action cards, a camera panel, verified results, a token meter, a replay
+  mode, and runs that can be continued or retried;
+\item \textbf{more accurate results}: only VERIFIED numbers reach the report, focusing is reported against the far field
+  as well as against the background ring (the lesson of Homework~2), and the modeling team reproduces the Homework~1
+  test RMSE exactly;
 \item \textbf{four new instrument tools} (black level, ADC bit depth, temperature, TIFF export; Homework~3, section~(g)),
   which the instrument team uses on its own;
 \item \textbf{a token budget}: every model call is counted, and the design keeps a run to about 1\,\% of the weekly
@@ -117,10 +121,17 @@ so no API key is needed; the executor's tool calls come back as JSON and are run
 LangChain chat model can be used instead (\texttt{make\_backend}).
 
 %======================================================================
-\section*{3. The web application}
+\section*{3. The application: backend and frontend}
 %======================================================================
-\texttt{python -m streamlit run lab/app.py} opens the app (\texttt{lab/app.py} draws the page; \texttt{lab/app\_core.py}
-runs each run on a worker thread, so the page refreshes every second while the agents work, and lists the saved runs).
+\textbf{Backend} (no user interface, usable from any frontend or a script): \texttt{lab/lab\_assistant.py} (the director,
+the teams and \texttt{LabRun}: start, resume, retry, pending question, usage, save), \texttt{lab/app\_core.py} (one worker
+thread per run with a job queue, the list of saved runs, frames and figures), the camera's MCP server
+(\texttt{hw3/mcp\_server/camera\_server.py}, a separate process over stdio) and the model backend
+(\texttt{claude\_cli.py}). Every run is a folder (\texttt{lab/runs/<thread>/}: \texttt{run.json}, \texttt{transcript.json},
+checkpoints, the teams' files), so a run survives a restart and can be replayed. \textbf{Frontends}: the web app
+\texttt{lab/app.py} and the terminal \texttt{lab/run\_lab.py}, both on the same \texttt{LabRun} API.
+\texttt{python -m streamlit run lab/app.py} opens the web app; it reads the backend's state every second while the
+agents work.
 \begin{itemize}[leftmargin=*,itemsep=1pt]
 \item \textbf{Chat}: the request, the director's decisions, each team's report with its VERIFIED record, and the team's
   internal work (orchestrator, scientist, executor, every camera command and its result) in a box per task.
@@ -167,7 +178,8 @@ run & request and result & model calls & output tokens\\ \midrule
 \texttt{run-20261015-151420} & \emph{Measure the camera's noise model and predict the focusing enhancement the optics
   bench would reach with this camera.} Instrument team (two tasks): conversion gain 2.401\,e$^-$/DN (true 2.40), dark
   noise 2.52\,DN, full well $\ge$ 9737\,e$^-$ (true 10\,000), read noise 6.04\,e$^-$ (true 6.0) marked \emph{not verified}
-  by the team; optics team with this camera model: enhancement 5.4--6.4 at 64 segments. 14.5 minutes. & 85 (4 + 81) &
+  by the team; optics team with this camera model: enhancement 5.3--5.7 against the far field (5.4--6.4 against the
+  background ring) at 64 segments. 14.5 minutes. & 85 (4 + 81) &
   143\,617\\
 \texttt{modeling-check} & \emph{How well does the kept Silverbox network predict the test record? Report its free-run
   RMSE.} (director without stops) Modeling team: free-run RMSE 0.422\,mV on the 1024 test samples, 0.70\,\% of the
