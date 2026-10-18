@@ -1,0 +1,8 @@
+{
+ "thread": "run-20261018-150040",
+ "camera": "hikrobot",
+ "director_model": "claude-cli:claude-sonnet-5-5@low",
+ "team_model": "claude-cli:claude-haiku-5-5@low",
+ "allow_human": true,
+ "seed": 1
+}

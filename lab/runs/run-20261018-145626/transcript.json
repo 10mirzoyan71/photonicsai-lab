@@ -1,0 +1,1328 @@
+{
+ "thread": "run-20261018-145626",
+ "dialogue": [
+  {
+   "role": "user",
+   "content": "Find an exposure at which the camera image uses about half of its range.",
+   "meta": {}
+  },
+  {
+   "role": "director",
+   "content": "Decision 1/6 -> human (hard decision)\nProposed step: instrument: Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only.\nQuestion: To find an exposure that uses about half of the range, the instrument team must change the exposure setting of the real camera (Hikrobot MV-CS028-10UM). Gain, black level and ADC bit depth stay as they are unless needed. Proceed?\nReason: Finding the exposure requires changing exposure settings on the real camera, so approval is needed first.",
+   "meta": {
+    "decision": {
+     "next": "human",
+     "task": "",
+     "question": "To find an exposure that uses about half of the range, the instrument team must change the exposure setting of the real camera (Hikrobot MV-CS028-10UM). Gain, black level and ADC bit depth stay as they are unless needed. Proceed?",
+     "stop_kind": "hard_decision",
+     "pending": "instrument",
+     "pending_task": "Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only.",
+     "reason": "Finding the exposure requires changing exposure settings on the real camera, so approval is needed first."
+    },
+    "index": 1,
+    "guard_notes": []
+   }
+  },
+  {
+   "role": "human",
+   "content": "yes",
+   "meta": {
+    "kind": "hard_decision",
+    "question": "To find an exposure that uses about half of the range, the instrument team must change the exposure setting of the real camera (Hikrobot MV-CS028-10UM). Gain, black level and ADC bit depth stay as they are unless needed. Proceed?",
+    "approved": true,
+    "pending": {
+     "next": "instrument",
+     "task": "Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only."
+    }
+   }
+  },
+  {
+   "role": "team",
+   "content": "[instrument team, task 1] Decision 4/8 -> finish\nInstruction: Final report (all numbers VERIFIED from the instrument; percent-of-full-scale values are derived from DN / 4095, the camera's max_dn for 12-bit).\n\nSettings held constant: gain 0.0 dB, 12-bit ADC (max_dn 4095), full ROI 1936x1464 at offset 0,0. Black level was not returned by camera_info and was not changed.\n\nFinal exposure: 10400 us (applied as returned by set_exposure). This is the setting whose latest capture is closest to the 50% target.\n- Mean: 2002.2 DN, which is 48.9% of full scale (cap006.npy).\n- Peak (max): 2272 DN, which is 55.5% of full scale. p99.9: 2223.0 DN, which is 54.3%.\n- Saturated pixels: 0 (fraction 0.0).\n- Median: not returned by the tools, so not reported.\n\nRepeatability, with the same settings:\n- 10400 us: 1995.48 DN (cap003, 1 frame); 1930.73 DN (cap004, 2-frame aggregate, temporal noise 17.60 DN rms); 2002.2 DN (cap006); and an earlier 1822.15 DN (cap002) that was not reproduced.\n- 10000 us: 1968.86 DN (cap001); 2015.91 DN (cap005).\n- Frame-to-frame spread is roughly \u00b150 DN. Across the captures the mean at 10000 to 10400 us ranges from about 1930 to 2016 DN, so the mean is about 47% to 49% of full scale. The 10000 and 10400 us settings are not clearly separable within this noise.\n\nConclusion: 10400 us gives a mean of about 49% of full scale with no saturation, which is within about 1 percentage point of the 50% target. Exposure is not the only source of variation: the 1822 DN outlier and the spread between repeats show that a single capture is not reliable to better than about \u00b12.5%. If an exact 50% is required, a multi-frame average at 10400 to 10600 us would be the next step, but it was not measured here. Files: camera/cap001_exp10000.npy, cap002_exp10400.npy, cap003.npy, cap004_exp10400_repeat.npy, cap005_repeat_exp10000.npy, cap006.npy.\nReason: A VERIFIED measurement exists with the mean at about 49% of full scale and no saturation, so the task can be closed with an honest report.",
+   "meta": {
+    "team": "instrument",
+    "task": "Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only.",
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 2002.2,
+      "max_dn": 2272,
+      "p99_9_dn": 2223.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4889,
+       "p99_9": 0.5429,
+       "max": 0.5548
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap003.npy",
+      "cap004_exp10400_repeat.npy",
+      "cap005_repeat_exp10000.npy",
+      "cap006.npy"
+     ]
+    },
+    "thread": "run-20261018-145626-1-instrument",
+    "turns": 31
+   }
+  },
+  {
+   "role": "director",
+   "content": "Exposure result (instrument team, REAL Hikrobot MV-CS028-10UM; nothing simulated):\n- Exposure 10400 us, gain 0.0 dB, 12-bit ADC (max 4095), full ROI 1936x1464, black level setting 180.\n- Mean 2002.2 DN = 48.9% of full scale. Max 2272 DN (55.5%). p99.9 2223.0 DN (54.3%). Saturated pixels: 0.\n- Repeats at 10000-10400 us gave means of about 1930-2016 DN (47-49%). Frame-to-frame spread is about \u00b150 DN, so a single capture is reliable to about \u00b12.5%.\n- Median was not reported by the tools.\n- For an exact 50%, a multi-frame average at 10400-10600 us would be the next step. It was not measured.",
+   "meta": {
+    "decision": {
+     "next": "finish",
+     "task": "Exposure result (instrument team, REAL Hikrobot MV-CS028-10UM; nothing simulated):\n- Exposure 10400 us, gain 0.0 dB, 12-bit ADC (max 4095), full ROI 1936x1464, black level setting 180.\n- Mean 2002.2 DN = 48.9% of full scale. Max 2272 DN (55.5%). p99.9 2223.0 DN (54.3%). Saturated pixels: 0.\n- Repeats at 10000-10400 us gave means of about 1930-2016 DN (47-49%). Frame-to-frame spread is about \u00b150 DN, so a single capture is reliable to about \u00b12.5%.\n- Median was not reported by the tools.\n- For an exact 50%, a multi-frame average at 10400-10600 us would be the next step. It was not measured.",
+     "question": "",
+     "stop_kind": "none",
+     "pending": "none",
+     "pending_task": "",
+     "reason": "The instrument team's VERIFIED record answers the request: mean about 49% of full scale with no saturation."
+    },
+    "index": 2,
+    "stop": "finished",
+    "records": [
+     [
+      "instrument",
+      {
+       "tool": "camera",
+       "settings": {
+        "exposure_us": 10400.0,
+        "gain_db": 0.0,
+        "roi": {
+         "x": 0,
+         "y": 0,
+         "width": 1936,
+         "height": 1464
+        },
+        "adc_bit_depth": 12,
+        "black_level_setting": 180
+       },
+       "stats": {
+        "mean_dn": 2002.2,
+        "max_dn": 2272,
+        "p99_9_dn": 2223.0,
+        "saturated_pixels": 0,
+        "saturated_fraction": 0.0,
+        "fraction_of_full_scale": {
+         "mean": 0.4889,
+         "p99_9": 0.5429,
+         "max": 0.5548
+        }
+       },
+       "temporal_noise": null,
+       "frames": [
+        "cap003.npy",
+        "cap004_exp10400_repeat.npy",
+        "cap005_repeat_exp10000.npy",
+        "cap006.npy"
+       ]
+      }
+     ]
+    ]
+   }
+  }
+ ],
+ "events": [
+  {
+   "source": "user",
+   "role": "user",
+   "content": "Find an exposure at which the camera image uses about half of its range.",
+   "meta": {}
+  },
+  {
+   "source": "director",
+   "role": "director",
+   "content": "Decision 1/6 -> human (hard decision)\nProposed step: instrument: Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only.\nQuestion: To find an exposure that uses about half of the range, the instrument team must change the exposure setting of the real camera (Hikrobot MV-CS028-10UM). Gain, black level and ADC bit depth stay as they are unless needed. Proceed?\nReason: Finding the exposure requires changing exposure settings on the real camera, so approval is needed first.",
+   "meta": {
+    "decision": {
+     "next": "human",
+     "task": "",
+     "question": "To find an exposure that uses about half of the range, the instrument team must change the exposure setting of the real camera (Hikrobot MV-CS028-10UM). Gain, black level and ADC bit depth stay as they are unless needed. Proceed?",
+     "stop_kind": "hard_decision",
+     "pending": "instrument",
+     "pending_task": "Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only.",
+     "reason": "Finding the exposure requires changing exposure settings on the real camera, so approval is needed first."
+    },
+    "index": 1,
+    "guard_notes": []
+   }
+  },
+  {
+   "source": "user",
+   "role": "human",
+   "content": "yes",
+   "meta": {
+    "reply": true
+   }
+  },
+  {
+   "source": "director",
+   "role": "human",
+   "content": "yes",
+   "meta": {
+    "kind": "hard_decision",
+    "question": "To find an exposure that uses about half of the range, the instrument team must change the exposure setting of the real camera (Hikrobot MV-CS028-10UM). Gain, black level and ADC bit depth stay as they are unless needed. Proceed?",
+    "approved": true,
+    "pending": {
+     "next": "instrument",
+     "task": "Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "orchestrator",
+   "content": "Decision 1/8 -> hardware\nInstruction: Read the current camera settings first (exposure time, gain, black level, ADC bit depth / pixel format) and report them exactly as the camera returns them. Keep gain, black level and ADC bit depth unchanged. Then set exposure to a starting value (e.g. 10000 us), capture one frame, and report the exposure time actually applied plus the frame statistics the camera or tools return (mean, median, peak in DN, saturated-pixel fraction at full scale for the current bit depth). Do not change anything else. Report every number as returned by the instrument, labelled VERIFIED. Stop after this single capture and wait for the next instruction.\nReason: No measurement exists yet, so we need the current settings and a first baseline capture at a starting exposure before any adjustment.",
+   "meta": {
+    "decision": {
+     "next_role": "hardware",
+     "instruction": "Read the current camera settings first (exposure time, gain, black level, ADC bit depth / pixel format) and report them exactly as the camera returns them. Keep gain, black level and ADC bit depth unchanged. Then set exposure to a starting value (e.g. 10000 us), capture one frame, and report the exposure time actually applied plus the frame statistics the camera or tools return (mean, median, peak in DN, saturated-pixel fraction at full scale for the current bit depth). Do not change anything else. Report every number as returned by the instrument, labelled VERIFIED. Stop after this single capture and wait for the next instruction.",
+     "reason": "No measurement exists yet, so we need the current settings and a first baseline capture at a starting exposure before any adjustment."
+    },
+    "index": 1,
+    "guard_notes": [],
+    "verified": null,
+    "refused_record": false
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "camera_info -> {\"vendor\": \"Hikrobot\", \"model\": \"MV-CS028-10UM\", \"sensor_width\": 1936, \"sensor_height\": 1464, \"bit_depth\": 12, \"max_dn\": 4095, \"exposure_range_us\": [9.0, 9999839.0], \"gain_range_db\": [0.0, 23.981199264526367], \"exposure_us\": 4000.0, \"gain_db\": 0.0, \"roi\": {\"x\": 0, \"y\": 0, \"width\": 1936, \"height\": 1464}, \"illumination_control\": false, \"lab_limits\": {\"max_exposure_us\": 500000, \"max_gain_db\": 24, \"max_frames\": 16}}",
+   "meta": {
+    "hw": "start",
+    "tool": "camera_info",
+    "result": {
+     "ok": true,
+     "vendor": "Hikrobot",
+     "model": "MV-CS028-10UM",
+     "serial": "DA6874945",
+     "interface": "USB3 Vision via Hikrobot MVS SDK",
+     "sensor_width": 1936,
+     "sensor_height": 1464,
+     "bit_depth": 12,
+     "pixel_format": "Mono12",
+     "adc_bit_depth": 12,
+     "black_level_setting": 180,
+     "max_dn": 4095,
+     "exposure_range_us": [
+      9.0,
+      9999839.0
+     ],
+     "gain_range_db": [
+      0.0,
+      23.981199264526367
+     ],
+     "exposure_us": 4000.0,
+     "gain_db": 0.0,
+     "roi": {
+      "x": 0,
+      "y": 0,
+      "width": 1936,
+      "height": 1464
+     },
+     "illumination_control": false,
+     "simulated": false,
+     "lab_limits": {
+      "max_exposure_us": 500000,
+      "max_gain_db": 24,
+      "max_frames": 16
+     }
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 1: set_exposure {\"exposure_us\": 10000}, then capture 1 frame(s)\nReason: Settings were read from camera_info (exposure 4000 us, gain 0.0 dB, 12-bit ADC); now set the starting exposure of 10000 us.",
+   "meta": {
+    "hw": "decide",
+    "step": 1,
+    "decision": {
+     "action": "command",
+     "command": "set_exposure",
+     "command_args": {
+      "exposure_us": 10000
+     },
+     "n_frames": 1,
+     "label": "exp10000",
+     "regions": [],
+     "analyze": true,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "",
+     "reason": "Settings were read from camera_info (exposure 4000 us, gain 0.0 dB, 12-bit ADC); now set the starting exposure of 10000 us."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "set_exposure {\"exposure_us\": 10000} -> ok {\"exposure_us\": 10000.0}",
+   "meta": {
+    "hw": "command",
+    "tool": "set_exposure",
+    "args": {
+     "exposure_us": 10000
+    },
+    "result": {
+     "ok": true,
+     "exposure_us": 10000.0
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "capture -> 1 frame(s) at 10000 us, 0 dB, ROI 1936x1464+0+0: mean 1968.86 DN, std 96.22, max 2242, p99.9 2191.0 (0.535 of full scale), saturated 0 px (0.0); file camera/cap001_exp10000.npy\nanalyze_frame -> {\"speckle\": {\"contrast\": 0.0489, \"mean_above_black_dn\": 1968.86, \"grain_fwhm_x_px\": 626.787, \"grain_fwhm_y_px\": 23388.634, \"pixels\": 2834304}, \"beam\": {\"centroid_x_px\": 966.84, \"centroid_y_px\": 735.05, \"d4sigma_x_px\": 2281.44, \"d4sigma_y_px\": 1688.56, \"total_dn\": 5580361656.0}}",
+   "meta": {
+    "hw": "measure",
+    "capture": {
+     "ok": true,
+     "settings": {
+      "exposure_us": 10000.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "height": 1464,
+      "width": 1936,
+      "mean_dn": 1968.86,
+      "std_dn": 96.22,
+      "min_dn": 1734,
+      "max_dn": 2242,
+      "p99_9_dn": 2191.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4808,
+       "p99_9": 0.535,
+       "max": 0.5475
+      }
+     },
+     "frame_file": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap001_exp10000.npy",
+     "preview_png": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap001_exp10000.png",
+     "n_frames": 1
+    },
+    "analysis": {
+     "ok": true,
+     "speckle": {
+      "contrast": 0.0489,
+      "mean_above_black_dn": 1968.86,
+      "grain_fwhm_x_px": 626.787,
+      "grain_fwhm_y_px": 23388.634,
+      "pixels": 2834304
+     },
+     "beam": {
+      "centroid_x_px": 966.84,
+      "centroid_y_px": 735.05,
+      "d4sigma_x_px": 2281.44,
+      "d4sigma_y_px": 1688.56,
+      "total_dn": 5580361656.0
+     }
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 2: finish: Settings as returned by camera_info (before the change): exposure_us 4000.0, gain_db 0.0, bit_depth 12, max_dn 4095, roi 1936x1464 at offset 0,0. camera_info did not return a black level or pixel format, so those were not read and not changed. set_exposure 10000 returned exposure_us 10000.0. One capture at 10000 us, 0 dB, full ROI 1936x1464: mean 1968.86 DN, std 96.22, max 2242 DN, p99.9 2191.0 DN (0.535 of full scale), saturated 0 px (0.0). No median was returned. analyze_frame: speckle contrast 0.0489, mean_above_black_dn 1968.86. Frame saved as camera/cap001_exp10000.npy. Stopping here as instructed, awaiting the next instruction.\nReason: The instruction asked for the settings readout, one baseline capture at 10000 us, and a stop.",
+   "meta": {
+    "hw": "decide",
+    "step": 2,
+    "decision": {
+     "action": "finish",
+     "command": "none",
+     "command_args": {},
+     "n_frames": 1,
+     "label": "",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "Settings as returned by camera_info (before the change): exposure_us 4000.0, gain_db 0.0, bit_depth 12, max_dn 4095, roi 1936x1464 at offset 0,0. camera_info did not return a black level or pixel format, so those were not read and not changed. set_exposure 10000 returned exposure_us 10000.0. One capture at 10000 us, 0 dB, full ROI 1936x1464: mean 1968.86 DN, std 96.22, max 2242 DN, p99.9 2191.0 DN (0.535 of full scale), saturated 0 px (0.0). No median was returned. analyze_frame: speckle contrast 0.0489, mean_above_black_dn 1968.86. Frame saved as camera/cap001_exp10000.npy. Stopping here as instructed, awaiting the next instruction.",
+     "reason": "The instruction asked for the settings readout, one baseline capture at 10000 us, and a stop."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware turn report: Settings as returned by camera_info (before the change): exposure_us 4000.0, gain_db 0.0, bit_depth 12, max_dn 4095, roi 1936x1464 at offset 0,0. camera_info did not return a black level or pixel format, so those were not read and not changed. set_exposure 10000 returned exposure_us 10000.0. One capture at 10000 us, 0 dB, full ROI 1936x1464: mean 1968.86 DN, std 96.22, max 2242 DN, p99.9 2191.0 DN (0.535 of full scale), saturated 0 px (0.0). No median was returned. analyze_frame: speckle contrast 0.0489, mean_above_black_dn 1968.86. Frame saved as camera/cap001_exp10000.npy. Stopping here as instructed, awaiting the next instruction.\n\n[instrument record]\ncommands: 1 (1 applied), captures: 1\n  set_exposure {\"exposure_us\": 10000} -> ok\n  capture 1 frame(s) at 10000 us, 0 dB, ROI 1936x1464+0+0: mean 1968.86 DN, std 96.22, max 2242, p99.9 2191.0 (0.535 of full scale), saturated 0 px (0.0); file camera/cap001_exp10000.npy",
+   "meta": {
+    "hw": "report",
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10000.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 1968.86,
+      "max_dn": 2242,
+      "p99_9_dn": 2191.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4808,
+       "p99_9": 0.535,
+       "max": 0.5475
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap001_exp10000.npy"
+     ],
+     "analysis": {
+      "speckle": {
+       "contrast": 0.0489,
+       "mean_above_black_dn": 1968.86,
+       "grain_fwhm_x_px": 626.787,
+       "grain_fwhm_y_px": 23388.634,
+       "pixels": 2834304
+      },
+      "beam": {
+       "centroid_x_px": 966.84,
+       "centroid_y_px": 735.05,
+       "d4sigma_x_px": 2281.44,
+       "d4sigma_y_px": 1688.56,
+       "total_dn": 5580361656.0
+      }
+     }
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "orchestrator",
+   "content": "Decision 2/8 -> hardware\nInstruction: Set exposure to 10400 us (keep gain 0 dB, black level and 12-bit ADC unchanged, full ROI). Capture one frame and report exactly what the instrument returns: the applied exposure, mean DN, std, max DN, p99.9 DN, saturated pixel count and fraction, and the median DN if the tools can return it (if not, say so; do not estimate it). Label every number VERIFIED and stop after this single capture.\nReason: Baseline at 10000 us gave mean 1968.86 DN (0.4808 of 4095) with 0 saturated pixels, so a proportional increase of about 4% (to ~10400 us) should bring the mean near the 50% target (~2048 DN).",
+   "meta": {
+    "decision": {
+     "next_role": "hardware",
+     "instruction": "Set exposure to 10400 us (keep gain 0 dB, black level and 12-bit ADC unchanged, full ROI). Capture one frame and report exactly what the instrument returns: the applied exposure, mean DN, std, max DN, p99.9 DN, saturated pixel count and fraction, and the median DN if the tools can return it (if not, say so; do not estimate it). Label every number VERIFIED and stop after this single capture.",
+     "reason": "Baseline at 10000 us gave mean 1968.86 DN (0.4808 of 4095) with 0 saturated pixels, so a proportional increase of about 4% (to ~10400 us) should bring the mean near the 50% target (~2048 DN)."
+    },
+    "index": 2,
+    "guard_notes": [],
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10000.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 1968.86,
+      "max_dn": 2242,
+      "p99_9_dn": 2191.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4808,
+       "p99_9": 0.535,
+       "max": 0.5475
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap001_exp10000.npy"
+     ],
+     "analysis": {
+      "speckle": {
+       "contrast": 0.0489,
+       "mean_above_black_dn": 1968.86,
+       "grain_fwhm_x_px": 626.787,
+       "grain_fwhm_y_px": 23388.634,
+       "pixels": 2834304
+      },
+      "beam": {
+       "centroid_x_px": 966.84,
+       "centroid_y_px": 735.05,
+       "d4sigma_x_px": 2281.44,
+       "d4sigma_y_px": 1688.56,
+       "total_dn": 5580361656.0
+      }
+     }
+    },
+    "refused_record": false
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "camera_info -> {\"vendor\": \"Hikrobot\", \"model\": \"MV-CS028-10UM\", \"sensor_width\": 1936, \"sensor_height\": 1464, \"bit_depth\": 12, \"max_dn\": 4095, \"exposure_range_us\": [9.0, 9999839.0], \"gain_range_db\": [0.0, 23.981199264526367], \"exposure_us\": 10000.0, \"gain_db\": 0.0, \"roi\": {\"x\": 0, \"y\": 0, \"width\": 1936, \"height\": 1464}, \"illumination_control\": false, \"lab_limits\": {\"max_exposure_us\": 500000, \"max_gain_db\": 24, \"max_frames\": 16}}",
+   "meta": {
+    "hw": "start",
+    "tool": "camera_info",
+    "result": {
+     "ok": true,
+     "vendor": "Hikrobot",
+     "model": "MV-CS028-10UM",
+     "serial": "DA6874945",
+     "interface": "USB3 Vision via Hikrobot MVS SDK",
+     "sensor_width": 1936,
+     "sensor_height": 1464,
+     "bit_depth": 12,
+     "pixel_format": "Mono12",
+     "adc_bit_depth": 12,
+     "black_level_setting": 180,
+     "max_dn": 4095,
+     "exposure_range_us": [
+      9.0,
+      9999839.0
+     ],
+     "gain_range_db": [
+      0.0,
+      23.981199264526367
+     ],
+     "exposure_us": 10000.0,
+     "gain_db": 0.0,
+     "roi": {
+      "x": 0,
+      "y": 0,
+      "width": 1936,
+      "height": 1464
+     },
+     "illumination_control": false,
+     "simulated": false,
+     "lab_limits": {
+      "max_exposure_us": 500000,
+      "max_gain_db": 24,
+      "max_frames": 16
+     }
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 1: set_exposure {\"exposure_us\": 10400}, then capture 1 frame(s)\nReason: Orchestrator instructed setting exposure to 10400 us to move the mean toward the 50% target, keeping gain, black level and ADC unchanged.",
+   "meta": {
+    "hw": "decide",
+    "step": 1,
+    "decision": {
+     "action": "command",
+     "command": "set_exposure",
+     "command_args": {
+      "exposure_us": 10400
+     },
+     "n_frames": 1,
+     "label": "exp10400",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "",
+     "reason": "Orchestrator instructed setting exposure to 10400 us to move the mean toward the 50% target, keeping gain, black level and ADC unchanged."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "set_exposure {\"exposure_us\": 10400} -> ok {\"exposure_us\": 10400.0}",
+   "meta": {
+    "hw": "command",
+    "tool": "set_exposure",
+    "args": {
+     "exposure_us": 10400
+    },
+    "result": {
+     "ok": true,
+     "exposure_us": 10400.0
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "capture -> 1 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 1822.15 DN, std 88.73, max 2072, p99.9 2022.0 (0.4938 of full scale), saturated 0 px (0.0); file camera/cap002_exp10400.npy",
+   "meta": {
+    "hw": "measure",
+    "capture": {
+     "ok": true,
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "height": 1464,
+      "width": 1936,
+      "mean_dn": 1822.15,
+      "std_dn": 88.73,
+      "min_dn": 1613,
+      "max_dn": 2072,
+      "p99_9_dn": 2022.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.445,
+       "p99_9": 0.4938,
+       "max": 0.506
+      }
+     },
+     "frame_file": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap002_exp10400.npy",
+     "preview_png": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap002_exp10400.png",
+     "n_frames": 1
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 2: finish: VERIFIED from the instrument: set_exposure 10400 returned exposure_us 10400.0. One capture at 10400 us, 0 dB, 12-bit, full ROI 1936x1464+0+0: mean 1822.15 DN, std 88.73, max 2072 DN, p99.9 2022.0 DN (0.4938 of full scale), saturated 0 px (0.0). File: camera/cap002_exp10400.npy. Median: not returned by the tools, so not reported.\n\nAnomaly: the mean fell from 1968.86 DN at 10000 us (cap001) to 1822.15 DN at 10400 us (cap002), and max fell from 2242 to 2072 DN. A 4% longer exposure should have raised the mean, so this is not explained by exposure alone. Possible causes include drift, a change in the light source, or a setting I did not read back. I did not investigate further because the instruction was a single capture and stop.\n\nDerived by me, not returned by the camera: 1822.15 / 4095 = 0.445 of full scale for the mean. Its 50% target is not met at 10400 us. Next step, if you want it: repeat a capture at 10400 us, or run a short capture_series, to check whether the drop is repeatable.\nReason: The orchestrator asked for one capture at 10400 us and a stop, so I am ending here and flagging an anomaly.",
+   "meta": {
+    "hw": "decide",
+    "step": 2,
+    "decision": {
+     "action": "finish",
+     "command": "none",
+     "command_args": {},
+     "n_frames": 1,
+     "label": "",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "VERIFIED from the instrument: set_exposure 10400 returned exposure_us 10400.0. One capture at 10400 us, 0 dB, 12-bit, full ROI 1936x1464+0+0: mean 1822.15 DN, std 88.73, max 2072 DN, p99.9 2022.0 DN (0.4938 of full scale), saturated 0 px (0.0). File: camera/cap002_exp10400.npy. Median: not returned by the tools, so not reported.\n\nAnomaly: the mean fell from 1968.86 DN at 10000 us (cap001) to 1822.15 DN at 10400 us (cap002), and max fell from 2242 to 2072 DN. A 4% longer exposure should have raised the mean, so this is not explained by exposure alone. Possible causes include drift, a change in the light source, or a setting I did not read back. I did not investigate further because the instruction was a single capture and stop.\n\nDerived by me, not returned by the camera: 1822.15 / 4095 = 0.445 of full scale for the mean. Its 50% target is not met at 10400 us. Next step, if you want it: repeat a capture at 10400 us, or run a short capture_series, to check whether the drop is repeatable.",
+     "reason": "The orchestrator asked for one capture at 10400 us and a stop, so I am ending here and flagging an anomaly."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware turn report: VERIFIED from the instrument: set_exposure 10400 returned exposure_us 10400.0. One capture at 10400 us, 0 dB, 12-bit, full ROI 1936x1464+0+0: mean 1822.15 DN, std 88.73, max 2072 DN, p99.9 2022.0 DN (0.4938 of full scale), saturated 0 px (0.0). File: camera/cap002_exp10400.npy. Median: not returned by the tools, so not reported.\n\nAnomaly: the mean fell from 1968.86 DN at 10000 us (cap001) to 1822.15 DN at 10400 us (cap002), and max fell from 2242 to 2072 DN. A 4% longer exposure should have raised the mean, so this is not explained by exposure alone. Possible causes include drift, a change in the light source, or a setting I did not read back. I did not investigate further because the instruction was a single capture and stop.\n\nDerived by me, not returned by the camera: 1822.15 / 4095 = 0.445 of full scale for the mean. Its 50% target is not met at 10400 us. Next step, if you want it: repeat a capture at 10400 us, or run a short capture_series, to check whether the drop is repeatable.\n\n[instrument record]\ncommands: 1 (1 applied), captures: 1\n  set_exposure {\"exposure_us\": 10400} -> ok\n  capture 1 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 1822.15 DN, std 88.73, max 2072, p99.9 2022.0 (0.4938 of full scale), saturated 0 px (0.0); file camera/cap002_exp10400.npy",
+   "meta": {
+    "hw": "report",
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 1822.15,
+      "max_dn": 2072,
+      "p99_9_dn": 2022.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.445,
+       "p99_9": 0.4938,
+       "max": 0.506
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap002_exp10400.npy"
+     ]
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "orchestrator",
+   "content": "Decision 3/8 -> hardware\nInstruction: Check whether the mean drop is repeatable. Do not change gain (0 dB), black level or the 12-bit ADC, and keep the full ROI 1936x1464. Step 1: call camera_info and report exposure_us, gain_db, bit_depth and roi exactly as returned. Step 2: set_exposure 10400 us, capture 2 frames, and report each frame's mean, std, max, p99.9, saturated count and fraction, exactly as returned. Step 3: set_exposure 10000 us, capture 1 frame, and report the same stats. Step 4: set_exposure 10400 us again, capture 1 frame, and report the same stats. Label every number VERIFIED. Do not estimate or derive a median; say if it is not returned. Stop after these captures.\nReason: The mean dropped from 1968.86 DN at 10000 us to 1822.15 DN at 10400 us, which exposure alone does not explain, so repeated captures at both exposures are needed to tell drift from a real effect before adjusting further.",
+   "meta": {
+    "decision": {
+     "next_role": "hardware",
+     "instruction": "Check whether the mean drop is repeatable. Do not change gain (0 dB), black level or the 12-bit ADC, and keep the full ROI 1936x1464. Step 1: call camera_info and report exposure_us, gain_db, bit_depth and roi exactly as returned. Step 2: set_exposure 10400 us, capture 2 frames, and report each frame's mean, std, max, p99.9, saturated count and fraction, exactly as returned. Step 3: set_exposure 10000 us, capture 1 frame, and report the same stats. Step 4: set_exposure 10400 us again, capture 1 frame, and report the same stats. Label every number VERIFIED. Do not estimate or derive a median; say if it is not returned. Stop after these captures.",
+     "reason": "The mean dropped from 1968.86 DN at 10000 us to 1822.15 DN at 10400 us, which exposure alone does not explain, so repeated captures at both exposures are needed to tell drift from a real effect before adjusting further."
+    },
+    "index": 3,
+    "guard_notes": [],
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 1822.15,
+      "max_dn": 2072,
+      "p99_9_dn": 2022.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.445,
+       "p99_9": 0.4938,
+       "max": 0.506
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap002_exp10400.npy"
+     ]
+    },
+    "refused_record": false
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "camera_info -> {\"vendor\": \"Hikrobot\", \"model\": \"MV-CS028-10UM\", \"sensor_width\": 1936, \"sensor_height\": 1464, \"bit_depth\": 12, \"max_dn\": 4095, \"exposure_range_us\": [9.0, 9999839.0], \"gain_range_db\": [0.0, 23.981199264526367], \"exposure_us\": 10400.0, \"gain_db\": 0.0, \"roi\": {\"x\": 0, \"y\": 0, \"width\": 1936, \"height\": 1464}, \"illumination_control\": false, \"lab_limits\": {\"max_exposure_us\": 500000, \"max_gain_db\": 24, \"max_frames\": 16}}",
+   "meta": {
+    "hw": "start",
+    "tool": "camera_info",
+    "result": {
+     "ok": true,
+     "vendor": "Hikrobot",
+     "model": "MV-CS028-10UM",
+     "serial": "DA6874945",
+     "interface": "USB3 Vision via Hikrobot MVS SDK",
+     "sensor_width": 1936,
+     "sensor_height": 1464,
+     "bit_depth": 12,
+     "pixel_format": "Mono12",
+     "adc_bit_depth": 12,
+     "black_level_setting": 180,
+     "max_dn": 4095,
+     "exposure_range_us": [
+      9.0,
+      9999839.0
+     ],
+     "gain_range_db": [
+      0.0,
+      23.981199264526367
+     ],
+     "exposure_us": 10400.0,
+     "gain_db": 0.0,
+     "roi": {
+      "x": 0,
+      "y": 0,
+      "width": 1936,
+      "height": 1464
+     },
+     "illumination_control": false,
+     "simulated": false,
+     "lab_limits": {
+      "max_exposure_us": 500000,
+      "max_gain_db": 24,
+      "max_frames": 16
+     }
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 1: set_exposure {\"exposure_us\": 10400}, then capture 1 frame(s)\nReason: Step 2 of the instruction: set exposure to 10400 us; the command's automatic capture is followed by a 2-frame measurement to check repeatability.",
+   "meta": {
+    "hw": "decide",
+    "step": 1,
+    "decision": {
+     "action": "command",
+     "command": "set_exposure",
+     "command_args": {
+      "exposure_us": 10400
+     },
+     "n_frames": 1,
+     "label": "",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "",
+     "reason": "Step 2 of the instruction: set exposure to 10400 us; the command's automatic capture is followed by a 2-frame measurement to check repeatability."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "set_exposure {\"exposure_us\": 10400} -> ok {\"exposure_us\": 10400.0}",
+   "meta": {
+    "hw": "command",
+    "tool": "set_exposure",
+    "args": {
+     "exposure_us": 10400
+    },
+    "result": {
+     "ok": true,
+     "exposure_us": 10400.0
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "capture -> 1 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 1995.48 DN, std 97.24, max 2268, p99.9 2217.0 (0.5414 of full scale), saturated 0 px (0.0); file camera/cap003.npy",
+   "meta": {
+    "hw": "measure",
+    "capture": {
+     "ok": true,
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "height": 1464,
+      "width": 1936,
+      "mean_dn": 1995.48,
+      "std_dn": 97.24,
+      "min_dn": 1765,
+      "max_dn": 2268,
+      "p99_9_dn": 2217.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4873,
+       "p99_9": 0.5414,
+       "max": 0.5538
+      }
+     },
+     "frame_file": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap003.npy",
+     "preview_png": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap003.png",
+     "n_frames": 1
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 2: capture 2 frame(s) with the current settings\nReason: Step 2 of the instruction asks for 2 frames at 10400 us; the set_exposure command already produced one capture (cap003, mean 1995.48 DN), so one measurement of 2 frames at the current 10400 us setting completes it.",
+   "meta": {
+    "hw": "decide",
+    "step": 2,
+    "decision": {
+     "action": "measure",
+     "command": "none",
+     "command_args": {},
+     "n_frames": 2,
+     "label": "exp10400_repeat",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "",
+     "reason": "Step 2 of the instruction asks for 2 frames at 10400 us; the set_exposure command already produced one capture (cap003, mean 1995.48 DN), so one measurement of 2 frames at the current 10400 us setting completes it."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "capture -> 2 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 1930.73 DN, std 94.1, max 2201, p99.9 2143.0 (0.5233 of full scale), saturated 0 px (0.0); temporal noise 17.5954 DN rms (var 309.5986, mean 1930.264); file camera/cap004_exp10400_repeat.npy",
+   "meta": {
+    "hw": "measure",
+    "capture": {
+     "ok": true,
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "height": 1464,
+      "width": 1936,
+      "mean_dn": 1930.73,
+      "std_dn": 94.1,
+      "min_dn": 1704,
+      "max_dn": 2201,
+      "p99_9_dn": 2143.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4715,
+       "p99_9": 0.5233,
+       "max": 0.5375
+      }
+     },
+     "frame_file": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap004_exp10400_repeat.npy",
+     "preview_png": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap004_exp10400_repeat.png",
+     "n_frames": 2,
+     "temporal_noise": {
+      "pairs": 1,
+      "mean_dn": 1930.264,
+      "temporal_var_dn2": 309.5986,
+      "temporal_std_dn": 17.5954,
+      "frame_mean_spread_dn": 0.461
+     }
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 3: set_exposure {\"exposure_us\": 10000}, then capture 1 frame(s)\nReason: Step 3 of the orchestrator's repeatability check: set exposure back to 10000 us, then capture one frame with the set_exposure measurement.",
+   "meta": {
+    "hw": "decide",
+    "step": 3,
+    "decision": {
+     "action": "command",
+     "command": "set_exposure",
+     "command_args": {
+      "exposure_us": 10000
+     },
+     "n_frames": 1,
+     "label": "repeat_exp10000",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "",
+     "reason": "Step 3 of the orchestrator's repeatability check: set exposure back to 10000 us, then capture one frame with the set_exposure measurement."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "set_exposure {\"exposure_us\": 10000} -> ok {\"exposure_us\": 10000.0}",
+   "meta": {
+    "hw": "command",
+    "tool": "set_exposure",
+    "args": {
+     "exposure_us": 10000
+    },
+    "result": {
+     "ok": true,
+     "exposure_us": 10000.0
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "capture -> 1 frame(s) at 10000 us, 0 dB, ROI 1936x1464+0+0: mean 2015.91 DN, std 98.8, max 2290, p99.9 2238.0 (0.5465 of full scale), saturated 0 px (0.0); file camera/cap005_repeat_exp10000.npy",
+   "meta": {
+    "hw": "measure",
+    "capture": {
+     "ok": true,
+     "settings": {
+      "exposure_us": 10000.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "height": 1464,
+      "width": 1936,
+      "mean_dn": 2015.91,
+      "std_dn": 98.8,
+      "min_dn": 1788,
+      "max_dn": 2290,
+      "p99_9_dn": 2238.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4923,
+       "p99_9": 0.5465,
+       "max": 0.5592
+      }
+     },
+     "frame_file": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap005_repeat_exp10000.npy",
+     "preview_png": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap005_repeat_exp10000.png",
+     "n_frames": 1
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 4: set_exposure {\"exposure_us\": 10400}, then capture 1 frame(s)\nReason: Step 4 of the repeatability check: set exposure back to 10400 us; the command's automatic capture gives the one frame requested.",
+   "meta": {
+    "hw": "decide",
+    "step": 4,
+    "decision": {
+     "action": "command",
+     "command": "set_exposure",
+     "command_args": {
+      "exposure_us": 10400
+     },
+     "n_frames": 1,
+     "label": "",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "",
+     "reason": "Step 4 of the repeatability check: set exposure back to 10400 us; the command's automatic capture gives the one frame requested."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "set_exposure {\"exposure_us\": 10400} -> ok {\"exposure_us\": 10400.0}",
+   "meta": {
+    "hw": "command",
+    "tool": "set_exposure",
+    "args": {
+     "exposure_us": 10400
+    },
+    "result": {
+     "ok": true,
+     "exposure_us": 10400.0
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "instrument",
+   "content": "capture -> 1 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 2002.2 DN, std 97.6, max 2272, p99.9 2223.0 (0.5429 of full scale), saturated 0 px (0.0); file camera/cap006.npy",
+   "meta": {
+    "hw": "measure",
+    "capture": {
+     "ok": true,
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "height": 1464,
+      "width": 1936,
+      "mean_dn": 2002.2,
+      "std_dn": 97.6,
+      "min_dn": 1768,
+      "max_dn": 2272,
+      "p99_9_dn": 2223.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4889,
+       "p99_9": 0.5429,
+       "max": 0.5548
+      }
+     },
+     "frame_file": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap006.npy",
+     "preview_png": "C:\\Users\\erik_\\PyCharmMiscProject\\photonicsai-lab\\lab\\runs\\run-20261018-145626\\teams\\instrument\\camera\\cap006.png",
+     "n_frames": 1
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware step 5: finish: VERIFIED from the instrument.\n\nStep 1, camera_info: exposure_us 10400.0, gain_db 0.0, bit_depth 12, max_dn 4095, roi x=0, y=0, width=1936, height=1464.\n\nStep 2, set_exposure 10400 returned exposure_us 10400.0. The automatic capture (cap003.npy): mean 1995.48 DN, std 97.24, max 2268, p99.9 2217.0 DN (0.5414 of full scale), saturated 0 px (0.0). Then a 2-frame capture (cap004_exp10400_repeat.npy): mean 1930.73 DN, std 94.1, max 2201, p99.9 2143.0 DN (0.5233 of full scale), saturated 0 px (0.0), temporal noise 17.5954 DN rms. The tool returned only this aggregate for the 2 frames, not separate stats for each frame.\n\nStep 3, set_exposure 10000 returned exposure_us 10000.0. Capture (cap005_repeat_exp10000.npy): mean 2015.91 DN, std 98.8, max 2290, p99.9 2238.0 DN (0.5465 of full scale), saturated 0 px (0.0).\n\nStep 4, set_exposure 10400 returned exposure_us 10400.0. Capture (cap006.npy): mean 2002.2 DN, std 97.6, max 2272, p99.9 2223.0 DN (0.5429 of full scale), saturated 0 px (0.0).\n\nMedian: not returned by the tools.\n\nRepeatability: the earlier 1822.15 DN mean at 10400 us (cap002) was not reproduced. The later 10400 us captures gave means of 1995.48, 1930.73 (2-frame) and 2002.2 DN, so the drop looks like a one-off variation rather than an effect of exposure. Mean signal is about 1930 to 2016 DN across the four captures at 10000 and 10400 us, with frame-to-frame spread of roughly \u00b150 DN. No change was made to gain, black level, bit depth or ROI.\nReason: All four requested steps of the repeatability check are complete, so the turn ends here.",
+   "meta": {
+    "hw": "decide",
+    "step": 5,
+    "decision": {
+     "action": "finish",
+     "command": "none",
+     "command_args": {},
+     "n_frames": 1,
+     "label": "",
+     "regions": [],
+     "analyze": false,
+     "black_level_dn": 0.0,
+     "analysis_region": null,
+     "question": "",
+     "summary": "VERIFIED from the instrument.\n\nStep 1, camera_info: exposure_us 10400.0, gain_db 0.0, bit_depth 12, max_dn 4095, roi x=0, y=0, width=1936, height=1464.\n\nStep 2, set_exposure 10400 returned exposure_us 10400.0. The automatic capture (cap003.npy): mean 1995.48 DN, std 97.24, max 2268, p99.9 2217.0 DN (0.5414 of full scale), saturated 0 px (0.0). Then a 2-frame capture (cap004_exp10400_repeat.npy): mean 1930.73 DN, std 94.1, max 2201, p99.9 2143.0 DN (0.5233 of full scale), saturated 0 px (0.0), temporal noise 17.5954 DN rms. The tool returned only this aggregate for the 2 frames, not separate stats for each frame.\n\nStep 3, set_exposure 10000 returned exposure_us 10000.0. Capture (cap005_repeat_exp10000.npy): mean 2015.91 DN, std 98.8, max 2290, p99.9 2238.0 DN (0.5465 of full scale), saturated 0 px (0.0).\n\nStep 4, set_exposure 10400 returned exposure_us 10400.0. Capture (cap006.npy): mean 2002.2 DN, std 97.6, max 2272, p99.9 2223.0 DN (0.5429 of full scale), saturated 0 px (0.0).\n\nMedian: not returned by the tools.\n\nRepeatability: the earlier 1822.15 DN mean at 10400 us (cap002) was not reproduced. The later 10400 us captures gave means of 1995.48, 1930.73 (2-frame) and 2002.2 DN, so the drop looks like a one-off variation rather than an effect of exposure. Mean signal is about 1930 to 2016 DN across the four captures at 10000 and 10400 us, with frame-to-frame spread of roughly \u00b150 DN. No change was made to gain, black level, bit depth or ROI.",
+     "reason": "All four requested steps of the repeatability check are complete, so the turn ends here."
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "executor",
+   "content": "Hardware turn report: VERIFIED from the instrument.\n\nStep 1, camera_info: exposure_us 10400.0, gain_db 0.0, bit_depth 12, max_dn 4095, roi x=0, y=0, width=1936, height=1464.\n\nStep 2, set_exposure 10400 returned exposure_us 10400.0. The automatic capture (cap003.npy): mean 1995.48 DN, std 97.24, max 2268, p99.9 2217.0 DN (0.5414 of full scale), saturated 0 px (0.0). Then a 2-frame capture (cap004_exp10400_repeat.npy): mean 1930.73 DN, std 94.1, max 2201, p99.9 2143.0 DN (0.5233 of full scale), saturated 0 px (0.0), temporal noise 17.5954 DN rms. The tool returned only this aggregate for the 2 frames, not separate stats for each frame.\n\nStep 3, set_exposure 10000 returned exposure_us 10000.0. Capture (cap005_repeat_exp10000.npy): mean 2015.91 DN, std 98.8, max 2290, p99.9 2238.0 DN (0.5465 of full scale), saturated 0 px (0.0).\n\nStep 4, set_exposure 10400 returned exposure_us 10400.0. Capture (cap006.npy): mean 2002.2 DN, std 97.6, max 2272, p99.9 2223.0 DN (0.5429 of full scale), saturated 0 px (0.0).\n\nMedian: not returned by the tools.\n\nRepeatability: the earlier 1822.15 DN mean at 10400 us (cap002) was not reproduced. The later 10400 us captures gave means of 1995.48, 1930.73 (2-frame) and 2002.2 DN, so the drop looks like a one-off variation rather than an effect of exposure. Mean signal is about 1930 to 2016 DN across the four captures at 10000 and 10400 us, with frame-to-frame spread of roughly \u00b150 DN. No change was made to gain, black level, bit depth or ROI.\n\n[instrument record]\ncommands: 3 (3 applied), captures: 4\n  set_exposure {\"exposure_us\": 10400} -> ok\n  capture 1 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 1995.48 DN, std 97.24, max 2268, p99.9 2217.0 (0.5414 of full scale), saturated 0 px (0.0); file camera/cap003.npy\n  capture 2 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 1930.73 DN, std 94.1, max 2201, p99.9 2143.0 (0.5233 of full scale), saturated 0 px (0.0); temporal noise 17.5954 DN rms (var 309.5986, mean 1930.264); file camera/cap004_exp10400_repeat.npy\n  set_exposure {\"exposure_us\": 10000} -> ok\n  capture 1 frame(s) at 10000 us, 0 dB, ROI 1936x1464+0+0: mean 2015.91 DN, std 98.8, max 2290, p99.9 2238.0 (0.5465 of full scale), saturated 0 px (0.0); file camera/cap005_repeat_exp10000.npy\n  set_exposure {\"exposure_us\": 10400} -> ok\n  capture 1 frame(s) at 10400 us, 0 dB, ROI 1936x1464+0+0: mean 2002.2 DN, std 97.6, max 2272, p99.9 2223.0 (0.5429 of full scale), saturated 0 px (0.0); file camera/cap006.npy",
+   "meta": {
+    "hw": "report",
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 2002.2,
+      "max_dn": 2272,
+      "p99_9_dn": 2223.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4889,
+       "p99_9": 0.5429,
+       "max": 0.5548
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap003.npy",
+      "cap004_exp10400_repeat.npy",
+      "cap005_repeat_exp10000.npy",
+      "cap006.npy"
+     ]
+    }
+   }
+  },
+  {
+   "source": "instrument",
+   "role": "orchestrator",
+   "content": "Decision 4/8 -> finish\nInstruction: Final report (all numbers VERIFIED from the instrument; percent-of-full-scale values are derived from DN / 4095, the camera's max_dn for 12-bit).\n\nSettings held constant: gain 0.0 dB, 12-bit ADC (max_dn 4095), full ROI 1936x1464 at offset 0,0. Black level was not returned by camera_info and was not changed.\n\nFinal exposure: 10400 us (applied as returned by set_exposure). This is the setting whose latest capture is closest to the 50% target.\n- Mean: 2002.2 DN, which is 48.9% of full scale (cap006.npy).\n- Peak (max): 2272 DN, which is 55.5% of full scale. p99.9: 2223.0 DN, which is 54.3%.\n- Saturated pixels: 0 (fraction 0.0).\n- Median: not returned by the tools, so not reported.\n\nRepeatability, with the same settings:\n- 10400 us: 1995.48 DN (cap003, 1 frame); 1930.73 DN (cap004, 2-frame aggregate, temporal noise 17.60 DN rms); 2002.2 DN (cap006); and an earlier 1822.15 DN (cap002) that was not reproduced.\n- 10000 us: 1968.86 DN (cap001); 2015.91 DN (cap005).\n- Frame-to-frame spread is roughly \u00b150 DN. Across the captures the mean at 10000 to 10400 us ranges from about 1930 to 2016 DN, so the mean is about 47% to 49% of full scale. The 10000 and 10400 us settings are not clearly separable within this noise.\n\nConclusion: 10400 us gives a mean of about 49% of full scale with no saturation, which is within about 1 percentage point of the 50% target. Exposure is not the only source of variation: the 1822 DN outlier and the spread between repeats show that a single capture is not reliable to better than about \u00b12.5%. If an exact 50% is required, a multi-frame average at 10400 to 10600 us would be the next step, but it was not measured here. Files: camera/cap001_exp10000.npy, cap002_exp10400.npy, cap003.npy, cap004_exp10400_repeat.npy, cap005_repeat_exp10000.npy, cap006.npy.\nReason: A VERIFIED measurement exists with the mean at about 49% of full scale and no saturation, so the task can be closed with an honest report.",
+   "meta": {
+    "decision": {
+     "next_role": "finish",
+     "instruction": "Final report (all numbers VERIFIED from the instrument; percent-of-full-scale values are derived from DN / 4095, the camera's max_dn for 12-bit).\n\nSettings held constant: gain 0.0 dB, 12-bit ADC (max_dn 4095), full ROI 1936x1464 at offset 0,0. Black level was not returned by camera_info and was not changed.\n\nFinal exposure: 10400 us (applied as returned by set_exposure). This is the setting whose latest capture is closest to the 50% target.\n- Mean: 2002.2 DN, which is 48.9% of full scale (cap006.npy).\n- Peak (max): 2272 DN, which is 55.5% of full scale. p99.9: 2223.0 DN, which is 54.3%.\n- Saturated pixels: 0 (fraction 0.0).\n- Median: not returned by the tools, so not reported.\n\nRepeatability, with the same settings:\n- 10400 us: 1995.48 DN (cap003, 1 frame); 1930.73 DN (cap004, 2-frame aggregate, temporal noise 17.60 DN rms); 2002.2 DN (cap006); and an earlier 1822.15 DN (cap002) that was not reproduced.\n- 10000 us: 1968.86 DN (cap001); 2015.91 DN (cap005).\n- Frame-to-frame spread is roughly \u00b150 DN. Across the captures the mean at 10000 to 10400 us ranges from about 1930 to 2016 DN, so the mean is about 47% to 49% of full scale. The 10000 and 10400 us settings are not clearly separable within this noise.\n\nConclusion: 10400 us gives a mean of about 49% of full scale with no saturation, which is within about 1 percentage point of the 50% target. Exposure is not the only source of variation: the 1822 DN outlier and the spread between repeats show that a single capture is not reliable to better than about \u00b12.5%. If an exact 50% is required, a multi-frame average at 10400 to 10600 us would be the next step, but it was not measured here. Files: camera/cap001_exp10000.npy, cap002_exp10400.npy, cap003.npy, cap004_exp10400_repeat.npy, cap005_repeat_exp10000.npy, cap006.npy.",
+     "reason": "A VERIFIED measurement exists with the mean at about 49% of full scale and no saturation, so the task can be closed with an honest report."
+    },
+    "index": 4,
+    "guard_notes": [],
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 2002.2,
+      "max_dn": 2272,
+      "p99_9_dn": 2223.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4889,
+       "p99_9": 0.5429,
+       "max": 0.5548
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap003.npy",
+      "cap004_exp10400_repeat.npy",
+      "cap005_repeat_exp10000.npy",
+      "cap006.npy"
+     ]
+    },
+    "refused_record": false
+   }
+  },
+  {
+   "source": "director",
+   "role": "team",
+   "content": "[instrument team, task 1] Decision 4/8 -> finish\nInstruction: Final report (all numbers VERIFIED from the instrument; percent-of-full-scale values are derived from DN / 4095, the camera's max_dn for 12-bit).\n\nSettings held constant: gain 0.0 dB, 12-bit ADC (max_dn 4095), full ROI 1936x1464 at offset 0,0. Black level was not returned by camera_info and was not changed.\n\nFinal exposure: 10400 us (applied as returned by set_exposure). This is the setting whose latest capture is closest to the 50% target.\n- Mean: 2002.2 DN, which is 48.9% of full scale (cap006.npy).\n- Peak (max): 2272 DN, which is 55.5% of full scale. p99.9: 2223.0 DN, which is 54.3%.\n- Saturated pixels: 0 (fraction 0.0).\n- Median: not returned by the tools, so not reported.\n\nRepeatability, with the same settings:\n- 10400 us: 1995.48 DN (cap003, 1 frame); 1930.73 DN (cap004, 2-frame aggregate, temporal noise 17.60 DN rms); 2002.2 DN (cap006); and an earlier 1822.15 DN (cap002) that was not reproduced.\n- 10000 us: 1968.86 DN (cap001); 2015.91 DN (cap005).\n- Frame-to-frame spread is roughly \u00b150 DN. Across the captures the mean at 10000 to 10400 us ranges from about 1930 to 2016 DN, so the mean is about 47% to 49% of full scale. The 10000 and 10400 us settings are not clearly separable within this noise.\n\nConclusion: 10400 us gives a mean of about 49% of full scale with no saturation, which is within about 1 percentage point of the 50% target. Exposure is not the only source of variation: the 1822 DN outlier and the spread between repeats show that a single capture is not reliable to better than about \u00b12.5%. If an exact 50% is required, a multi-frame average at 10400 to 10600 us would be the next step, but it was not measured here. Files: camera/cap001_exp10000.npy, cap002_exp10400.npy, cap003.npy, cap004_exp10400_repeat.npy, cap005_repeat_exp10000.npy, cap006.npy.\nReason: A VERIFIED measurement exists with the mean at about 49% of full scale and no saturation, so the task can be closed with an honest report.",
+   "meta": {
+    "team": "instrument",
+    "task": "Find an exposure time at which the real camera image uses about half of its range (mean/median about 50% of full scale for the current ADC bit depth, with no saturation). Adjust exposure (keep gain, black level and ADC bit depth as they are unless needed), capture frames, and report the final exposure time, the mean and peak signal in DN and as a percent of full scale, and the fraction of saturated pixels. Report VERIFIED numbers only.",
+    "verified": {
+     "tool": "camera",
+     "settings": {
+      "exposure_us": 10400.0,
+      "gain_db": 0.0,
+      "roi": {
+       "x": 0,
+       "y": 0,
+       "width": 1936,
+       "height": 1464
+      },
+      "adc_bit_depth": 12,
+      "black_level_setting": 180
+     },
+     "stats": {
+      "mean_dn": 2002.2,
+      "max_dn": 2272,
+      "p99_9_dn": 2223.0,
+      "saturated_pixels": 0,
+      "saturated_fraction": 0.0,
+      "fraction_of_full_scale": {
+       "mean": 0.4889,
+       "p99_9": 0.5429,
+       "max": 0.5548
+      }
+     },
+     "temporal_noise": null,
+     "frames": [
+      "cap003.npy",
+      "cap004_exp10400_repeat.npy",
+      "cap005_repeat_exp10000.npy",
+      "cap006.npy"
+     ]
+    },
+    "thread": "run-20261018-145626-1-instrument",
+    "turns": 31
+   }
+  },
+  {
+   "source": "director",
+   "role": "director",
+   "content": "Exposure result (instrument team, REAL Hikrobot MV-CS028-10UM; nothing simulated):\n- Exposure 10400 us, gain 0.0 dB, 12-bit ADC (max 4095), full ROI 1936x1464, black level setting 180.\n- Mean 2002.2 DN = 48.9% of full scale. Max 2272 DN (55.5%). p99.9 2223.0 DN (54.3%). Saturated pixels: 0.\n- Repeats at 10000-10400 us gave means of about 1930-2016 DN (47-49%). Frame-to-frame spread is about \u00b150 DN, so a single capture is reliable to about \u00b12.5%.\n- Median was not reported by the tools.\n- For an exact 50%, a multi-frame average at 10400-10600 us would be the next step. It was not measured.",
+   "meta": {
+    "decision": {
+     "next": "finish",
+     "task": "Exposure result (instrument team, REAL Hikrobot MV-CS028-10UM; nothing simulated):\n- Exposure 10400 us, gain 0.0 dB, 12-bit ADC (max 4095), full ROI 1936x1464, black level setting 180.\n- Mean 2002.2 DN = 48.9% of full scale. Max 2272 DN (55.5%). p99.9 2223.0 DN (54.3%). Saturated pixels: 0.\n- Repeats at 10000-10400 us gave means of about 1930-2016 DN (47-49%). Frame-to-frame spread is about \u00b150 DN, so a single capture is reliable to about \u00b12.5%.\n- Median was not reported by the tools.\n- For an exact 50%, a multi-frame average at 10400-10600 us would be the next step. It was not measured.",
+     "question": "",
+     "stop_kind": "none",
+     "pending": "none",
+     "pending_task": "",
+     "reason": "The instrument team's VERIFIED record answers the request: mean about 49% of full scale with no saturation."
+    },
+    "index": 2,
+    "stop": "finished",
+    "records": [
+     [
+      "instrument",
+      {
+       "tool": "camera",
+       "settings": {
+        "exposure_us": 10400.0,
+        "gain_db": 0.0,
+        "roi": {
+         "x": 0,
+         "y": 0,
+         "width": 1936,
+         "height": 1464
+        },
+        "adc_bit_depth": 12,
+        "black_level_setting": 180
+       },
+       "stats": {
+        "mean_dn": 2002.2,
+        "max_dn": 2272,
+        "p99_9_dn": 2223.0,
+        "saturated_pixels": 0,
+        "saturated_fraction": 0.0,
+        "fraction_of_full_scale": {
+         "mean": 0.4889,
+         "p99_9": 0.5429,
+         "max": 0.5548
+        }
+       },
+       "temporal_noise": null,
+       "frames": [
+        "cap003.npy",
+        "cap004_exp10400_repeat.npy",
+        "cap005_repeat_exp10000.npy",
+        "cap006.npy"
+       ]
+      }
+     ]
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "calls": 15,
+  "input": 30,
+  "output": 9045,
+  "cache_read": 26003,
+  "cache_write": 74179,
+  "cost_usd": 0.7476146,
+  "by_model": {
+   "claude-sonnet-5-5": {
+    "calls": 2,
+    "output": 897
+   },
+   "claude-haiku-5-5": {
+    "calls": 13,
+    "output": 8148
+   }
+  }
+ }
+}

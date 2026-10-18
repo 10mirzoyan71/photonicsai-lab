@@ -1,0 +1,22 @@
+exit_code=0 seconds=1.2
+--- stdout ---
+SHAPE_BATCH1=(16, 1464, 1936)
+SHAPE_BATCH2=(14, 1464, 1936)
+N_FRAMES=30
+FRAME_SHAPE=1464x1936
+mean_DN=128.8283
+std_DN=17.8426
+batch1_n_frames=16 batch1_mean_DN=142.1287 batch1_std_DN=13.1426
+batch2_n_frames=14 batch2_mean_DN=113.6280 batch2_std_DN=7.1811
+pixel_mean_std_DN=9.6518
+pixel_mean_min_DN=111.6333
+pixel_mean_max_DN=291.9667
+per_pixel_temporal_std_mean_DN=14.6336
+pixel_mean_p1_DN=114.3333
+pixel_mean_p99_DN=152.1000
+batch2_minus_batch1_DN=-28.5007
+se_diff_DN=6.5297
+diff_over_se=-4.365
+FRAME_MEANS=142.60,142.45,142.32,142.52,142.71,142.49,142.22,142.03,142.05,142.29,142.21,141.80,141.28,141.17,141.71,142.22,114.51,114.09,114.11,114.28,113.96,113.64,113.48,113.35,113.18,113.31,113.37,113.25,113.15,113.10
+
+--- stderr ---
