@@ -8,6 +8,37 @@ through MCP (HW3). This project puts them under one roof as a **laboratory with 
 web interface: a person asks the lab a question in plain words, approves steps on the real camera with a button, does
 what needs hands (blocking the light), and watches the camera and the results while the agents work.
 
+Report: [`report/homework45.pdf`](report/homework45.pdf).
+
+## What a scientist can use it for
+| The scientist wants to… | They ask the lab | They get |
+| --- | --- | --- |
+| characterise a camera before an experiment | "Measure the camera's noise model." | conversion gain (e⁻/DN), read noise, full well, dark level, all VERIFIED |
+| set up imaging quickly | "Find an exposure at half range." | exposure and gain without saturation, checked on the frames |
+| check the setup's stability | "Measure the stability for 2 minutes." | drift in %/min, room-light flicker, a time-series figure |
+| plan a DMD focusing experiment before the laser arrives | "Predict the focusing enhancement with this camera." | the predicted far-field enhancement and the search figures: does the camera limit it? |
+| test a model of a measured system | "Report the free-run RMSE of the kept model." | the RMSE from a script that ran (Silverbox: 0.422 mV) |
+
+Every run leaves a folder in `lab/runs/`: the transcript, every camera command with its time, frames (.npy, .png,
+TIFF), analysis scripts, figures and token use.
+
+## Devices
+* **Tested on real hardware:** the Hikrobot MV-CS028-10UM camera (MVS SDK, USB3 Vision / GenICam): exposure, gain,
+  ROI, black level, ADC bit depth, captures. The same connector should work with other monochrome Hikrobot cameras on
+  USB3 or GigE (not tested). This model does not expose its temperature.
+* **Simulated:** laser → DMD → scattering medium → camera (the HW2 bench, with the real camera's measured noise
+  model), and a camera with known parameters (laser speckle or room light) for tests.
+* **Can be added as a new team:** the lab's DMD, microscopes (stage, focus, light, camera, e.g. through Micro-Manager),
+  lasers, motorised stages, spectrometers, power meters, SLMs. Any device with an SDK or a documented API joins the
+  same way: a connector, its controls as MCP tools, its limits in the server, and a team under the same director.
+
+## On the real camera (18 October 2026)
+* `python hw3.py check-camera` passed; with the 12-bit ADC a frame has 213 distinct levels against 56 with 8 bits.
+* Live runs of the app (`lab/runs/run-20261018-*`): exposure at half range found at 16 400 µs (mean 0.519 of full
+  scale, no saturated pixel, 12 model calls) and, in the live demo, at 10 400 µs (48.9 %, 15 calls); a dark-level
+  measurement with the person covering the lens (30 dark frames, mean 128.8 DN; the team reported a drift of −28.5 DN
+  between its two batches as significant and left its cause open).
+
 ## The hierarchy
 ```
 Level 1  DIRECTOR (Claude Sonnet)        the person talks only to it; splits the request into team tasks, passes
