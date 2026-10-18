@@ -7,7 +7,7 @@
  "sensor_height": 1464,
  "bit_depth": 12,
  "pixel_format": "Mono12",
- "adc_bit_depth": "ADCBitDepth_12",
+ "adc_bit_depth": 12,
  "black_level_setting": 180,
  "max_dn": 4095,
  "exposure_range_us": [
@@ -18,7 +18,7 @@
   0.0,
   23.981199264526367
  ],
- "exposure_us": 2000.0,
+ "exposure_us": 4000.0,
  "gain_db": 0.0,
  "roi": {
   "x": 0,

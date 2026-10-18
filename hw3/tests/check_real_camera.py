@@ -58,7 +58,10 @@ def main():
         for _ in range(10):
             cam.grab()
         print(f"       {10 / (time.time() - t0):.1f} frames/s with software trigger at {e2:g} us")
-        step("read the device temperature (C)", cam.temperature_c)
+        try:                                  # MV-CS028-10UM: DeviceTemperature not readable (MVS 0x80000106)
+            print(f"[OK]   device temperature: {cam.temperature_c()} C", flush=True)
+        except Exception as e:                # noqa: BLE001
+            print(f"[SKIP] device temperature not readable on this camera: {e}", flush=True)
         bl0 = info.get("black_level_setting") or 180
         step("set black level 200 (a larger value lowers the dark level)", lambda: cam.set_black_level(200))
         fb = step("grab one frame", cam.grab)

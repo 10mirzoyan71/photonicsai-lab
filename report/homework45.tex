@@ -220,6 +220,14 @@ whenever a measurement needs hands (blocking and unblocking the light). The live
 app with the lab camera (\emph{REAL camera} in the side bar): a short request, the approval card, the camera commands
 through MCP and the frames in the camera panel; the longer run of section~4 is shown in the replay mode.
 
+\textbf{Lab check on 18 October (real camera).} \texttt{python hw3.py check-camera} passed on the MV-CS028-10UM: the new
+black-level, ADC and ROI tools work on the device, and with the 12-bit ADC a frame has 213 distinct levels against 56
+with 8 bits; this model does not expose \texttt{DeviceTemperature} (MVS error 0x80000106), so \texttt{read\_temperature}
+returns an error on it. Then the app ran on the real camera (run \texttt{run-20261018-103704}): request ``Find an
+exposure at which the camera image uses about half of its range'', one approval, captures at 4000, 14\,000 and
+16\,400\,$\mu$s; the final frame has a mean of 2124.4\,DN $=$ 0.519 of full scale and no saturated pixels (VERIFIED from
+the saved frame), with 12 model calls (2 Sonnet, 10 Haiku) and 7520 output tokens.
+
 %======================================================================
 \section*{6. Tests}
 %======================================================================
